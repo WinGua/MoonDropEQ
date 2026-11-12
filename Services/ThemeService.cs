@@ -83,7 +83,12 @@ public static class ThemeService
         try
         {
             var systemTheme = ApplicationThemeManager.GetSystemTheme();
-            return systemTheme == ApplicationTheme.Light ? ApplicationTheme.Light : ApplicationTheme.Dark;
+            return systemTheme switch
+            {
+                SystemTheme.Light => ApplicationTheme.Light,
+                SystemTheme.Dark => ApplicationTheme.Dark,
+                _ => ApplicationTheme.Dark
+            };
         }
         catch
         {
