@@ -39,7 +39,11 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <ui:TitleBar Grid.Row="0" Title="MoonDropEQ" ShowMaximize="False" />
+        <ui:TitleBar Grid.Row="0" Title="MoonDropEQ" ShowMaximize="False">
+            <ui:TitleBar.Icon>
+                <ui:ImageIcon Source="/Assets/app.png" />
+            </ui:TitleBar.Icon>
+        </ui:TitleBar>
 
         <Grid Grid.Row="1">
             <Grid x:Name="MainView">
