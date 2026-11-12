@@ -52,6 +52,7 @@ public partial class MainWindow : FluentWindow
         _tray = new TrayService();
         _tray.ShowRequested += ShowFromTray;
         _tray.ExitRequested += ExitApplication;
+        _tray.AboutRequested += ShowAbout;
         _tray.PresetRequested += preset => _ = ApplyPresetAsync(preset);
         _tray.Update(_store.Presets);
 
@@ -249,6 +250,22 @@ public partial class MainWindow : FluentWindow
         {
             UseShellExecute = true
         });
+    }
+
+    private void About_Click(object sender, RoutedEventArgs e)
+    {
+        ShowAbout();
+    }
+
+    private void ShowAbout()
+    {
+        if (!IsVisible)
+        {
+            ShowFromTray();
+        }
+
+        var window = new AboutWindow { Owner = this };
+        window.ShowDialog();
     }
 
     private void PresetCard_Click(object sender, MouseButtonEventArgs e)

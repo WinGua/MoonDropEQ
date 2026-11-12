@@ -4,6 +4,7 @@
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
                  Title="MoonDropEQ"
+                 Icon="/Assets/app.png"
                  Width="420" Height="560"
                  MinWidth="360" MinHeight="460"
                  WindowStartupLocation="CenterScreen"
@@ -105,11 +106,14 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <Button x:Name="CaptureButton" Content="抓取当前曲线" Height="36"
                     HorizontalAlignment="Stretch" Click="CaptureButton_Click" />
             <Button Grid.Column="1" Content="配置文件" Height="36" Margin="8,0,0,0"
                     Click="OpenConfig_Click" />
+            <Button Grid.Column="2" Content="关于" Height="36" Margin="8,0,0,0"
+                    Click="About_Click" />
         </Grid>
     </Grid>
 </ui:FluentWindow>

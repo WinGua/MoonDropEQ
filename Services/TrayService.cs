@@ -13,6 +13,8 @@ public sealed class TrayService : IDisposable
 
     public event Action? ExitRequested;
 
+    public event Action? AboutRequested;
+
     public event Action<Preset>? PresetRequested;
 
     public TrayService()
@@ -47,6 +49,10 @@ public sealed class TrayService : IDisposable
         show.Click += (_, _) => ShowRequested?.Invoke();
         menu.Items.Add(show);
 
+        var about = new MenuItem { Header = "关于" };
+        about.Click += (_, _) => AboutRequested?.Invoke();
+        menu.Items.Add(about);
+
         var exit = new MenuItem { Header = "退出" };
         exit.Click += (_, _) => ExitRequested?.Invoke();
         menu.Items.Add(exit);
@@ -62,6 +68,13 @@ public sealed class TrayService : IDisposable
 
     private static System.Drawing.Icon CreateIcon()
     {
+        var assembly = typeof(TrayService).Assembly;
+        using var stream = assembly.GetManifestResourceStream("MoonDropEQ.app.ico");
+        if (stream is not null)
+        {
+            return new System.Drawing.Icon(stream, new System.Drawing.Size(32, 32));
+        }
+
         using var bitmap = new System.Drawing.Bitmap(32, 32);
         using (var graphics = System.Drawing.Graphics.FromImage(bitmap))
         {
@@ -69,8 +82,6 @@ public sealed class TrayService : IDisposable
             graphics.Clear(System.Drawing.Color.Transparent);
             using var brush = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(76, 194, 255));
             graphics.FillEllipse(brush, 5, 5, 22, 22);
-            using var pen = new System.Drawing.Pen(System.Drawing.Color.FromArgb(230, 240, 255), 2.4f);
-            graphics.DrawArc(pen, 9, 12, 14, 10, 200, 150);
         }
         return System.Drawing.Icon.FromHandle(bitmap.GetHicon());
     }
