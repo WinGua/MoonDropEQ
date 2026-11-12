@@ -22,6 +22,7 @@ public partial class MainWindow : FluentWindow
     private TrayService? _tray;
     private RaysDevice? _device;
     private Preset? _lastCurve;
+    private Preset? _activePreset;
     private bool _busy;
     private bool _exiting;
 
@@ -293,6 +294,117 @@ public partial class MainWindow : FluentWindow
         }
     }
 
+    private void PresetCard_RightClick(object sender, MouseButtonEventArgs e)
+    {
+        if (sender is not FrameworkElement { Tag: PresetItem item })
+        {
+            return;
+        }
+
+        e.Handled = true;
+
+        var menu = new ContextMenu();
+
+        var rename = new MenuItem { Header = "重命名" };
+        rename.Click += (_, _) => RenamePreset(item.Model);
+        menu.Items.Add(rename);
+
+        var hotkey = new MenuItem { Header = "设置热键…" };
+        hotkey.Click += (_, _) => EditHotkey(item.Model);
+        menu.Items.Add(hotkey);
+
+        menu.Items.Add(new Separator());
+
+        var remove = new MenuItem { Header = "删除" };
+        remove.Click += (_, _) => DeletePreset(item.Model);
+        menu.Items.Add(remove);
+
+        menu.PlacementTarget = (UIElement)sender;
+        menu.IsOpen = true;
+    }
+
+    private void RenamePreset(Preset preset)
+    {
+        var name = RenameDialog.Show(this, "重命名预设", "输入新的名称：", preset.Name);
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return;
+        }
+
+        var trimmed = name.Trim();
+        if (trimmed == preset.Name)
+        {
+            return;
+        }
+
+        preset.Name = trimmed;
+        _store.Save();
+        RefreshItems();
+        SetActive(_activePreset);
+        _tray?.Update(_store.Presets);
+        ShowToast($"已改名为：{trimmed}");
+    }
+
+    private void EditHotkey(Preset preset)
+    {
+        var gesture = HotkeyDialog.Show(this, preset.Name, preset.Hotkey);
+        if (gesture is null)
+        {
+            return;
+        }
+
+        if (!string.IsNullOrWhiteSpace(gesture))
+        {
+            var duplicate = _store.Presets.FirstOrDefault(p =>
+                p.Id != preset.Id &&
+                string.Equals(p.Hotkey, gesture, StringComparison.OrdinalIgnoreCase));
+            if (duplicate is not null)
+            {
+                ShowToast($"这个热键已被「{duplicate.Name}」占用", true);
+                return;
+            }
+        }
+
+        preset.Hotkey = gesture;
+        _store.Save();
+        RefreshItems();
+        SetActive(_activePreset);
+        RegisterHotkeys();
+        _tray?.Update(_store.Presets);
+        ShowToast(string.IsNullOrWhiteSpace(gesture) ? "已清除热键" : $"热键已设为 {gesture}");
+    }
+
+    private void DeletePreset(Preset preset)
+    {
+        var result = MessageBox.Show(
+            $"确定删除「{preset.Name}」吗？\n\n只会从本地列表移除，不会改动耳机内的设置。",
+            "删除预设",
+            MessageBoxButton.OKCancel,
+            MessageBoxImage.Question);
+
+        if (result != MessageBoxResult.OK)
+        {
+            return;
+        }
+
+        _store.Presets.Remove(preset);
+        _store.Save();
+
+        if (_activePreset == preset)
+        {
+            _activePreset = null;
+        }
+        if (_lastCurve == preset)
+        {
+            _lastCurve = null;
+        }
+
+        RefreshItems();
+        RegisterHotkeys();
+        _tray?.Update(_store.Presets);
+        ShowToast($"已删除：{preset.Name}");
+    }
+
     private void RefreshItems()
     {
         _items.Clear();
@@ -304,6 +416,8 @@ public partial class MainWindow : FluentWindow
 
     private void SetActive(Preset? preset)
     {
+        _activePreset = preset;
+
         foreach (var item in _items)
         {
             item.IsActive = preset is not null && item.Model.Id == preset.Id;

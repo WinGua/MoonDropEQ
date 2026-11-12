@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ui:FluentWindow x:Class="MoonDropEQ.HotkeyDialog"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                 Title="设置热键"
+                 Icon="/Assets/app.png"
+                 Width="380"
+                 SizeToContent="Height"
+                 WindowStartupLocation="CenterOwner"
+                 WindowBackdropType="Mica"
+                 ExtendsContentIntoTitleBar="True"
+                 ResizeMode="NoResize"
+                 ShowInTaskbar="False"
+                 PreviewKeyDown="Window_PreviewKeyDown">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar Grid.Row="0" Title="设置热键" ShowMaximize="False" ShowMinimize="False" />
+
+        <StackPanel Grid.Row="1" Margin="20,4,20,20">
+            <TextBlock x:Name="PresetText" FontSize="12" TextWrapping="Wrap"
+                       Foreground="{DynamicResource AppTextSecondaryBrush}" />
+
+            <Border Margin="0,12,0,0" Padding="16" CornerRadius="8"
+                    Background="{DynamicResource AppSurfaceBrush}"
+                    BorderBrush="{DynamicResource AppBorderBrush}"
+                    BorderThickness="1">
+                <TextBlock x:Name="GestureText" FontFamily="Consolas" FontSize="18"
+                           HorizontalAlignment="Center"
+                           Foreground="{DynamicResource AppTextPrimaryBrush}"
+                           Text="按下组合键" />
+            </Border>
+
+            <TextBlock x:Name="StatusText" Margin="0,8,0,0" FontSize="12" TextWrapping="Wrap"
+                       LineHeight="18"
+                       Foreground="{DynamicResource AppTextTertiaryBrush}"
+                       Text="按下组合键，例如 Ctrl+Alt+6；单功能键仅支持 F1–F24" />
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+                <Button Content="清除" Height="32" Width="72" Click="Clear_Click" />
+                <Button Content="取消" Height="32" Width="72" Margin="8,0,0,0" Click="Cancel_Click" />
+                <Button Content="确定" Height="32" Width="72" Margin="8,0,0,0" IsDefault="True" Click="Ok_Click" />
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</ui:FluentWindow>
