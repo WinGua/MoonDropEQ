@@ -288,9 +288,59 @@ public partial class MainWindow : FluentWindow
 
     private void PresetCard_Click(object sender, MouseButtonEventArgs e)
     {
+        if (FindButton(e.OriginalSource as DependencyObject) is not null)
+        {
+            return;
+        }
+
         if (sender is FrameworkElement { Tag: PresetItem item })
         {
             _ = ApplyPresetAsync(item.Model);
+        }
+    }
+
+    private static System.Windows.Controls.Primitives.ButtonBase? FindButton(DependencyObject? node)
+    {
+        while (node is not null)
+        {
+            if (node is System.Windows.Controls.Primitives.ButtonBase button)
+            {
+                return button;
+            }
+
+            if (node is not System.Windows.Media.Visual
+                && node is not System.Windows.Media.Media3D.Visual3D)
+            {
+                return null;
+            }
+
+            node = System.Windows.Media.VisualTreeHelper.GetParent(node);
+        }
+
+        return null;
+    }
+
+    private void Rename_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement { Tag: PresetItem item })
+        {
+            RenamePreset(item.Model);
+        }
+    }
+
+    private void Hotkey_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement { Tag: PresetItem item })
+        {
+            EditHotkey(item.Model);
+        }
+    }
+
+    private void Delete_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement { Tag: PresetItem item })
+        {
+            DeletePreset(item.Model);
         }
     }
 
@@ -376,13 +426,8 @@ public partial class MainWindow : FluentWindow
 
     private void DeletePreset(Preset preset)
     {
-        var result = System.Windows.MessageBox.Show(
-            $"确定删除「{preset.Name}」吗？\n\n只会从本地列表移除，不会改动耳机内的设置。",
-            "删除预设",
-            System.Windows.MessageBoxButton.OKCancel,
-            System.Windows.MessageBoxImage.Question);
-
-        if (result != System.Windows.MessageBoxResult.OK)
+        if (!ConfirmDialog.Show(this, "删除预设",
+                $"确定删除「{preset.Name}」吗？\n\n只会从本地列表移除，不会改动耳机内的设置。"))
         {
             return;
         }

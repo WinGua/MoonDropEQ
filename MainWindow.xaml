@@ -5,8 +5,8 @@
                  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
                  Title="MoonDropEQ"
                  Icon="/Assets/app.png"
-                 Width="420" Height="560"
-                 MinWidth="360" MinHeight="460"
+                 Width="560" Height="720"
+                 MinWidth="480" MinHeight="560"
                  WindowStartupLocation="CenterScreen"
                  WindowBackdropType="Mica"
                  ExtendsContentIntoTitleBar="True">
@@ -69,24 +69,41 @@
                                 MouseLeftButtonUp="PresetCard_Click"
                                 MouseRightButtonUp="PresetCard_RightClick">
                             <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="{Binding Name}" FontSize="14"
-                                               Foreground="{DynamicResource AppTextPrimaryBrush}" />
-                                    <TextBlock Text="{Binding KindText}" FontSize="12" Margin="0,2,0,0"
-                                               Foreground="{DynamicResource AppTextTertiaryBrush}" />
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <Grid Grid.Row="0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Name}" FontSize="15"
+                                                   Foreground="{DynamicResource AppTextPrimaryBrush}" />
+                                        <TextBlock Text="{Binding KindText}" FontSize="12" Margin="0,2,0,0"
+                                                   Foreground="{DynamicResource AppTextTertiaryBrush}" />
+                                    </StackPanel>
+                                    <Border Grid.Column="1" Padding="8,3" CornerRadius="4"
+                                            VerticalAlignment="Center"
+                                            Background="{DynamicResource AppSurfaceBrush}"
+                                            BorderBrush="{DynamicResource AppBorderBrush}"
+                                            BorderThickness="1">
+                                        <TextBlock Text="{Binding HotkeyText}" FontFamily="Consolas" FontSize="12"
+                                                   Foreground="{DynamicResource AppTextSecondaryBrush}" />
+                                    </Border>
+                                </Grid>
+
+                                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right"
+                                            Margin="0,10,0,0">
+                                    <Button Content="重命名" Height="28" Padding="12,0" FontSize="12"
+                                            Tag="{Binding}" Click="Rename_Click" />
+                                    <Button Content="设置热键" Height="28" Padding="12,0" FontSize="12"
+                                            Margin="8,0,0,0" Tag="{Binding}" Click="Hotkey_Click" />
+                                    <Button Content="删除" Height="28" Padding="12,0" FontSize="12"
+                                            Margin="8,0,0,0" Tag="{Binding}" Click="Delete_Click" />
                                 </StackPanel>
-                                <Border Grid.Column="1" Padding="8,3" CornerRadius="4"
-                                        VerticalAlignment="Center"
-                                        Background="{DynamicResource AppSurfaceBrush}"
-                                        BorderBrush="{DynamicResource AppBorderBrush}"
-                                        BorderThickness="1">
-                                    <TextBlock Text="{Binding HotkeyText}" FontFamily="Consolas" FontSize="12"
-                                               Foreground="{DynamicResource AppTextSecondaryBrush}" />
-                                </Border>
                             </Grid>
                         </Border>
                     </DataTemplate>
