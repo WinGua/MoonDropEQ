@@ -122,6 +122,10 @@
 - 推送 `v*` 标签 → 自动创建 Release 并附带 zip
 - 工作流：`.github/workflows/build.yml`（`windows-latest` + `dotnet publish -r win-x64 --self-contained`）
 
+## 维护
+
+协议常量、抓包方法、固件升级后的适配步骤与发版流程，见 [docs/maintenance.md](docs/maintenance.md)。
+
 ## 安全说明
 
 - 只写 EQ 参数区与「保存」命令，**不触碰固件分区、不涉及 OTA 升级**
