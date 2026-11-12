@@ -1,6 +1,6 @@
 # MoonDropEQ
 
-适用于 **水月雨 MOONDROP Rays（光束）** 的 Windows 桌面 EQ 预设遥控器。
+适用于 **水月雨 MOONDROP耳机** 的 Windows 桌面 EQ 预设遥控器（目前仅支持 **Rays / 光束**）。
 
 把官网 [水月雨在线调音工具](https://hub.moondroplab.tech/) 的「打开网页 → 选设备 → 开始使用 → 挑预设 → 点应用」五步，压缩成**一次点击**或**一个热键**。
 
