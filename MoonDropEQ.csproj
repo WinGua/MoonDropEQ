@@ -23,7 +23,7 @@
     <PackageReference Include="WPF-UI" Version="4.3.0" />
     <PackageReference Include="HidSharp" Version="2.6.4" />
     <PackageReference Include="H.NotifyIcon.Wpf" Version="2.3.2" />
-    <PackageReference Include="System.Drawing.Common" Version="8.0.0" />
+    <PackageReference Include="System.Drawing.Common" Version="9.0.1" />
   </ItemGroup>
 
 </Project>
