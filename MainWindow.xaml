@@ -13,8 +13,8 @@
 
     <ui:FluentWindow.Resources>
         <Style x:Key="PresetCardStyle" TargetType="Border">
-            <Setter Property="Background" Value="{StaticResource AppSurfaceBrush}" />
-            <Setter Property="BorderBrush" Value="{StaticResource AppBorderBrush}" />
+            <Setter Property="Background" Value="{DynamicResource AppSurfaceBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="CornerRadius" Value="8" />
             <Setter Property="Padding" Value="12,10" />
@@ -22,10 +22,10 @@
             <Setter Property="Cursor" Value="Hand" />
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="{StaticResource AppSurfaceHoverBrush}" />
+                    <Setter Property="Background" Value="{DynamicResource AppSurfaceHoverBrush}" />
                 </Trigger>
                 <DataTrigger Binding="{Binding IsActive}" Value="True">
-                    <Setter Property="BorderBrush" Value="{StaticResource AppAccentBrush}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource AppAccentBrush}" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -45,18 +45,18 @@
                 Margin="16,4,16,10"
                 Padding="12,10"
                 CornerRadius="8"
-                Background="{StaticResource AppSurfaceMutedBrush}"
-                BorderBrush="{StaticResource AppBorderBrush}"
+                Background="{DynamicResource AppSurfaceMutedBrush}"
+                BorderBrush="{DynamicResource AppBorderBrush}"
                 BorderThickness="1">
             <StackPanel Orientation="Horizontal">
                 <Ellipse x:Name="StatusDot" Width="8" Height="8"
-                         Fill="{StaticResource AppDangerBrush}" VerticalAlignment="Center" />
+                         Fill="{DynamicResource AppDangerBrush}" VerticalAlignment="Center" />
                 <TextBlock x:Name="StatusText" Margin="8,0,0,0" Text="正在查找耳机…"
                            FontSize="12" VerticalAlignment="Center"
-                           Foreground="{StaticResource AppTextSecondaryBrush}" />
+                           Foreground="{DynamicResource AppTextSecondaryBrush}" />
                 <TextBlock x:Name="ActiveText" Margin="12,0,0,0" Text=""
                            FontSize="12" VerticalAlignment="Center"
-                           Foreground="{StaticResource AppTextTertiaryBrush}" />
+                           Foreground="{DynamicResource AppTextTertiaryBrush}" />
             </StackPanel>
         </Border>
 
@@ -74,17 +74,17 @@
                                 </Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center">
                                     <TextBlock Text="{Binding Name}" FontSize="14"
-                                               Foreground="{StaticResource AppTextPrimaryBrush}" />
+                                               Foreground="{DynamicResource AppTextPrimaryBrush}" />
                                     <TextBlock Text="{Binding KindText}" FontSize="12" Margin="0,2,0,0"
-                                               Foreground="{StaticResource AppTextTertiaryBrush}" />
+                                               Foreground="{DynamicResource AppTextTertiaryBrush}" />
                                 </StackPanel>
                                 <Border Grid.Column="1" Padding="8,3" CornerRadius="4"
                                         VerticalAlignment="Center"
-                                        Background="{StaticResource AppSurfaceBrush}"
-                                        BorderBrush="{StaticResource AppBorderBrush}"
+                                        Background="{DynamicResource AppSurfaceBrush}"
+                                        BorderBrush="{DynamicResource AppBorderBrush}"
                                         BorderThickness="1">
                                     <TextBlock Text="{Binding HotkeyText}" FontFamily="Consolas" FontSize="12"
-                                               Foreground="{StaticResource AppTextSecondaryBrush}" />
+                                               Foreground="{DynamicResource AppTextSecondaryBrush}" />
                                 </Border>
                             </Grid>
                         </Border>
@@ -95,11 +95,11 @@
 
         <Border x:Name="Toast" Grid.Row="2" Margin="16,0,16,16" VerticalAlignment="Bottom"
                 Padding="12,8" CornerRadius="6" Visibility="Collapsed"
-                Background="#E61E1E1E"
-                BorderBrush="{StaticResource AppBorderBrush}" BorderThickness="1"
+                Background="{DynamicResource AppToastBrush}"
+                BorderBrush="{DynamicResource AppBorderBrush}" BorderThickness="1"
                 IsHitTestVisible="False">
             <TextBlock x:Name="ToastText" FontSize="12" TextWrapping="Wrap"
-                       Foreground="{StaticResource AppTextPrimaryBrush}" />
+                       Foreground="{DynamicResource AppTextPrimaryBrush}" />
         </Border>
 
         <Grid Grid.Row="3" Margin="16">
@@ -107,12 +107,15 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <Button x:Name="CaptureButton" Content="抓取当前曲线" Height="36"
                     HorizontalAlignment="Stretch" Click="CaptureButton_Click" />
             <Button Grid.Column="1" Content="配置文件" Height="36" Margin="8,0,0,0"
                     Click="OpenConfig_Click" />
-            <Button Grid.Column="2" Content="关于" Height="36" Margin="8,0,0,0"
+            <Button Grid.Column="2" Content="设置" Height="36" Margin="8,0,0,0"
+                    Click="Settings_Click" />
+            <Button Grid.Column="3" Content="关于" Height="36" Margin="8,0,0,0"
                     Click="About_Click" />
         </Grid>
     </Grid>

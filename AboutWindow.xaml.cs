@@ -18,6 +18,7 @@ public partial class AboutWindow : FluentWindow
     public AboutWindow()
     {
         InitializeComponent();
+        Services.ThemeService.ApplyBackdrop(this);
 
         var version = Assembly.GetExecutingAssembly().GetName().Version;
         VersionText.Text = version is null

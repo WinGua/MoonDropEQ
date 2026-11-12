@@ -27,6 +27,9 @@ public partial class App : Application
             args.Handled = true;
         };
 
+        var settings = Services.SettingsStore.Load();
+        Services.ThemeService.Initialize(settings);
+
         new MainWindow().Show();
     }
 

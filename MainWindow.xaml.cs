@@ -28,6 +28,7 @@ public partial class MainWindow : FluentWindow
     public MainWindow()
     {
         InitializeComponent();
+        ThemeService.ApplyBackdrop(this);
 
         _toastTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
         _toastTimer.Tick += (_, _) =>
@@ -252,6 +253,22 @@ public partial class MainWindow : FluentWindow
         });
     }
 
+    private void Settings_Click(object sender, RoutedEventArgs e)
+    {
+        ShowSettings();
+    }
+
+    private void ShowSettings()
+    {
+        if (!IsVisible)
+        {
+            ShowFromTray();
+        }
+
+        var window = new SettingsWindow { Owner = this };
+        window.ShowDialog();
+    }
+
     private void About_Click(object sender, RoutedEventArgs e)
     {
         ShowAbout();
@@ -354,7 +371,15 @@ public partial class MainWindow : FluentWindow
             return;
         }
 
-        e.Cancel = true;
-        Hide();
+        if (ThemeService.Current.CloseToTray)
+        {
+            e.Cancel = true;
+            Hide();
+            return;
+        }
+
+        _exiting = true;
+        DisposeInfrastructure();
+        Application.Current.Shutdown();
     }
 }
