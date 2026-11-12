@@ -54,7 +54,7 @@ public partial class MainWindow : FluentWindow
         _tray = new TrayService();
         _tray.ShowRequested += ShowFromTray;
         _tray.ExitRequested += ExitApplication;
-        _tray.AboutRequested += ShowAbout;
+        _tray.AboutRequested += () => ShowPage(AboutHost);
         _tray.PresetRequested += preset => _ = ApplyPresetAsync(preset);
         _tray.Update(_store.Presets);
 
@@ -256,34 +256,34 @@ public partial class MainWindow : FluentWindow
 
     private void Settings_Click(object sender, RoutedEventArgs e)
     {
-        ShowSettings();
-    }
-
-    private void ShowSettings()
-    {
-        if (!IsVisible)
-        {
-            ShowFromTray();
-        }
-
-        var window = new SettingsWindow { Owner = this };
-        window.ShowDialog();
+        ShowPage(SettingsHost);
     }
 
     private void About_Click(object sender, RoutedEventArgs e)
     {
-        ShowAbout();
+        ShowPage(AboutHost);
     }
 
-    private void ShowAbout()
+    private void Back_Click(object sender, RoutedEventArgs e)
+    {
+        SettingsHost.Visibility = Visibility.Collapsed;
+        AboutHost.Visibility = Visibility.Collapsed;
+        MainView.Visibility = Visibility.Visible;
+        FooterPanel.Visibility = Visibility.Visible;
+    }
+
+    private void ShowPage(Grid host)
     {
         if (!IsVisible)
         {
             ShowFromTray();
         }
 
-        var window = new AboutWindow { Owner = this };
-        window.ShowDialog();
+        MainView.Visibility = Visibility.Collapsed;
+        FooterPanel.Visibility = Visibility.Collapsed;
+        SettingsHost.Visibility = Visibility.Collapsed;
+        AboutHost.Visibility = Visibility.Collapsed;
+        host.Visibility = Visibility.Visible;
     }
 
     private void PresetCard_Click(object sender, MouseButtonEventArgs e)
@@ -353,19 +353,37 @@ public partial class MainWindow : FluentWindow
 
         e.Handled = true;
 
-        var menu = new System.Windows.Controls.ContextMenu();
+        var menu = new System.Windows.Controls.ContextMenu
+        {
+            Style = TryFindResource("AppContextMenuStyle") as Style
+        };
 
-        var rename = new System.Windows.Controls.MenuItem { Header = "重命名" };
+        var rename = new System.Windows.Controls.MenuItem
+        {
+            Header = "重命名",
+            Style = TryFindResource("AppMenuItemStyle") as Style
+        };
         rename.Click += (_, _) => RenamePreset(item.Model);
         menu.Items.Add(rename);
 
-        var hotkey = new System.Windows.Controls.MenuItem { Header = "设置热键…" };
+        var hotkey = new System.Windows.Controls.MenuItem
+        {
+            Header = "设置热键…",
+            Style = TryFindResource("AppMenuItemStyle") as Style
+        };
         hotkey.Click += (_, _) => EditHotkey(item.Model);
         menu.Items.Add(hotkey);
 
-        menu.Items.Add(new System.Windows.Controls.Separator());
+        menu.Items.Add(new System.Windows.Controls.Separator
+        {
+            Style = TryFindResource("AppMenuSeparatorStyle") as Style
+        });
 
-        var remove = new System.Windows.Controls.MenuItem { Header = "删除" };
+        var remove = new System.Windows.Controls.MenuItem
+        {
+            Header = "删除",
+            Style = TryFindResource("AppMenuItemStyle") as Style
+        };
         remove.Click += (_, _) => DeletePreset(item.Model);
         menu.Items.Add(remove);
 

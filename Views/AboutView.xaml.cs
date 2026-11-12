@@ -4,21 +4,20 @@ using System.Net.Http;
 using System.Reflection;
 using System.Text.Json;
 using System.Windows;
-using Wpf.Ui.Controls;
+using System.Windows.Controls;
 
-namespace MoonDropEQ;
+namespace MoonDropEQ.Views;
 
-public partial class AboutWindow : FluentWindow
+public partial class AboutView : UserControl
 {
     private const string LatestReleaseApi = "https://api.github.com/repos/WinGua/MoonDropEQ/releases/latest";
     private const string ReleasesPage = "https://github.com/WinGua/MoonDropEQ/releases";
 
     private string _downloadUrl = ReleasesPage;
 
-    public AboutWindow()
+    public AboutView()
     {
         InitializeComponent();
-        Services.ThemeService.ApplyBackdrop(this);
 
         var version = Assembly.GetExecutingAssembly().GetName().Version;
         VersionText.Text = version is null

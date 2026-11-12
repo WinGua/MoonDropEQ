@@ -1,3 +1,4 @@
+using System.Windows;
 using System.Windows.Controls;
 using H.NotifyIcon;
 using MoonDropEQ.Models;
@@ -23,37 +24,39 @@ public sealed class TrayService : IDisposable
         {
             ToolTipText = "MoonDropEQ",
             Icon = CreateIcon(),
-            ContextMenu = new ContextMenu()
+            ContextMenu = new ContextMenu { Style = MenuStyle("AppContextMenuStyle") }
         };
         _icon.TrayLeftMouseUp += (_, _) => ShowRequested?.Invoke();
     }
 
     public void Update(IEnumerable<Preset> presets)
     {
-        var menu = new ContextMenu();
+        var menu = new ContextMenu { Style = MenuStyle("AppContextMenuStyle") };
 
         foreach (var preset in presets)
         {
-            var header = string.IsNullOrWhiteSpace(preset.Hotkey)
-                ? preset.Name
-                : $"{preset.Name}    {preset.Hotkey}";
-            var item = new MenuItem { Header = header };
+            var item = new MenuItem
+            {
+                Header = preset.Name,
+                InputGestureText = preset.Hotkey,
+                Style = MenuStyle("AppMenuItemStyle")
+            };
             var captured = preset;
             item.Click += (_, _) => PresetRequested?.Invoke(captured);
             menu.Items.Add(item);
         }
 
-        menu.Items.Add(new Separator());
+        menu.Items.Add(new Separator { Style = MenuStyle("AppMenuSeparatorStyle") });
 
-        var show = new MenuItem { Header = "显示窗口" };
+        var show = new MenuItem { Header = "显示窗口", Style = MenuStyle("AppMenuItemStyle") };
         show.Click += (_, _) => ShowRequested?.Invoke();
         menu.Items.Add(show);
 
-        var about = new MenuItem { Header = "关于" };
+        var about = new MenuItem { Header = "关于", Style = MenuStyle("AppMenuItemStyle") };
         about.Click += (_, _) => AboutRequested?.Invoke();
         menu.Items.Add(about);
 
-        var exit = new MenuItem { Header = "退出" };
+        var exit = new MenuItem { Header = "退出", Style = MenuStyle("AppMenuItemStyle") };
         exit.Click += (_, _) => ExitRequested?.Invoke();
         menu.Items.Add(exit);
 
@@ -64,6 +67,11 @@ public sealed class TrayService : IDisposable
             _icon.ForceCreate();
             _created = true;
         }
+    }
+
+    private static Style? MenuStyle(string key)
+    {
+        return Application.Current?.TryFindResource(key) as Style;
     }
 
     private static System.Drawing.Icon CreateIcon()

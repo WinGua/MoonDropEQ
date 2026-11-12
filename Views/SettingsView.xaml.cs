@@ -1,18 +1,17 @@
 using System.Windows;
+using System.Windows.Controls;
 using MoonDropEQ.Models;
 using MoonDropEQ.Services;
-using Wpf.Ui.Controls;
 
-namespace MoonDropEQ;
+namespace MoonDropEQ.Views;
 
-public partial class SettingsWindow : FluentWindow
+public partial class SettingsView : UserControl
 {
     private bool _loading;
 
-    public SettingsWindow()
+    public SettingsView()
     {
         InitializeComponent();
-        ThemeService.ApplyBackdrop(this);
 
         _loading = true;
         var settings = ThemeService.Current;
@@ -82,10 +81,5 @@ public partial class SettingsWindow : FluentWindow
     private void LightTheme_Checked(object sender, RoutedEventArgs e)
     {
         UpdateSettings(settings => settings.Theme = ThemeMode.Light);
-    }
-
-    private void Done_Click(object sender, RoutedEventArgs e)
-    {
-        Close();
     }
 }

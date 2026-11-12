@@ -1,29 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ui:FluentWindow x:Class="MoonDropEQ.AboutWindow"
-                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                 xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-                 Title="关于"
-                 Icon="/Assets/app.png"
-                 Width="420" Height="600"
-                 WindowStartupLocation="CenterOwner"
-                 WindowBackdropType="Mica"
-                 ExtendsContentIntoTitleBar="True"
-                 ResizeMode="NoResize"
-                 ShowInTaskbar="False">
+<UserControl x:Class="MoonDropEQ.Views.AboutView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <ui:TitleBar Grid.Row="0" Title="关于" ShowMaximize="False" ShowMinimize="False" />
-
-        <ScrollViewer Grid.Row="1" Margin="0,4,0,0" VerticalScrollBarVisibility="Auto">
-            <StackPanel Margin="20,0,20,12">
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="20,4,20,12">
                 <StackPanel Orientation="Horizontal">
-                    <Image Width="56" Height="56" Source="/Assets/app.png" RenderOptions.BitmapScalingMode="HighQuality" />
+                    <Image Width="56" Height="56" Source="/Assets/app.png"
+                           RenderOptions.BitmapScalingMode="HighQuality" />
                     <StackPanel Margin="14,0,0,0" VerticalAlignment="Center">
                         <TextBlock Text="MoonDropEQ" FontSize="18"
                                    Foreground="{DynamicResource AppTextPrimaryBrush}" />
@@ -75,8 +64,8 @@
             </StackPanel>
         </ScrollViewer>
 
-        <TextBlock Grid.Row="2" Margin="0,0,0,14" HorizontalAlignment="Center" FontSize="12"
+        <TextBlock Grid.Row="1" Margin="0,0,0,14" HorizontalAlignment="Center" FontSize="12"
                    Foreground="{DynamicResource AppTextTertiaryBrush}"
                    Text="Built by Winter with DeepSeek" />
     </Grid>
-</ui:FluentWindow>
+</UserControl>
