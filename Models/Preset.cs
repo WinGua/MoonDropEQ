@@ -1,0 +1,46 @@
+namespace MoonDropEQ.Models;
+
+public enum PresetKind
+{
+    /// <summary>耳机固件内置的场景预设，按索引切换。</summary>
+    BuiltIn,
+
+    /// <summary>自定义曲线，需要写入 PEQ 工作区。</summary>
+    Curve
+}
+
+public sealed class Preset
+{
+    public string Id { get; set; } = Guid.NewGuid().ToString("N");
+
+    public string Name { get; set; } = string.Empty;
+
+    public PresetKind Kind { get; set; } = PresetKind.BuiltIn;
+
+    /// <summary>内置预设对应的设备索引。</summary>
+    public int Index { get; set; }
+
+    public double PreGainDb { get; set; }
+
+    public double GlobalGainDb { get; set; }
+
+    /// <summary>8 段 PEQ 原始载荷，每段 33 字节的十六进制字符串。</summary>
+    public List<string> Bands { get; set; } = new();
+
+    public string Hotkey { get; set; } = string.Empty;
+
+    public Preset Clone()
+    {
+        return new Preset
+        {
+            Id = Id,
+            Name = Name,
+            Kind = Kind,
+            Index = Index,
+            PreGainDb = PreGainDb,
+            GlobalGainDb = GlobalGainDb,
+            Bands = new List<string>(Bands),
+            Hotkey = Hotkey
+        };
+    }
+}

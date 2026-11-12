@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ui:FluentWindow x:Class="MoonDropEQ.MainWindow"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                 Title="MoonDropEQ"
+                 Width="420" Height="560"
+                 MinWidth="360" MinHeight="460"
+                 WindowStartupLocation="CenterScreen"
+                 WindowBackdropType="Mica"
+                 ExtendsContentIntoTitleBar="True">
+
+    <ui:FluentWindow.Resources>
+        <Style x:Key="PresetCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource AppSurfaceBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource AppBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="12,10" />
+            <Setter Property="Margin" Value="0,0,0,8" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource AppSurfaceHoverBrush}" />
+                </Trigger>
+                <DataTrigger Binding="{Binding IsActive}" Value="True">
+                    <Setter Property="BorderBrush" Value="{StaticResource AppAccentBrush}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </ui:FluentWindow.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar Grid.Row="0" Title="MoonDropEQ" ShowMaximize="False" />
+
+        <Border Grid.Row="1"
+                Margin="16,4,16,10"
+                Padding="12,10"
+                CornerRadius="8"
+                Background="{StaticResource AppSurfaceMutedBrush}"
+                BorderBrush="{StaticResource AppBorderBrush}"
+                BorderThickness="1">
+            <StackPanel Orientation="Horizontal">
+                <Ellipse x:Name="StatusDot" Width="8" Height="8"
+                         Fill="{StaticResource AppDangerBrush}" VerticalAlignment="Center" />
+                <TextBlock x:Name="StatusText" Margin="8,0,0,0" Text="正在查找耳机…"
+                           FontSize="12" VerticalAlignment="Center"
+                           Foreground="{StaticResource AppTextSecondaryBrush}" />
+                <TextBlock x:Name="ActiveText" Margin="12,0,0,0" Text=""
+                           FontSize="12" VerticalAlignment="Center"
+                           Foreground="{StaticResource AppTextTertiaryBrush}" />
+            </StackPanel>
+        </Border>
+
+        <ScrollViewer Grid.Row="2" Margin="16,0,16,0" VerticalScrollBarVisibility="Auto">
+            <ItemsControl x:Name="PresetList">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Style="{StaticResource PresetCardStyle}"
+                                Tag="{Binding}"
+                                MouseLeftButtonUp="PresetCard_Click">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Name}" FontSize="14"
+                                               Foreground="{StaticResource AppTextPrimaryBrush}" />
+                                    <TextBlock Text="{Binding KindText}" FontSize="12" Margin="0,2,0,0"
+                                               Foreground="{StaticResource AppTextTertiaryBrush}" />
+                                </StackPanel>
+                                <Border Grid.Column="1" Padding="8,3" CornerRadius="4"
+                                        VerticalAlignment="Center"
+                                        Background="{StaticResource AppSurfaceBrush}"
+                                        BorderBrush="{StaticResource AppBorderBrush}"
+                                        BorderThickness="1">
+                                    <TextBlock Text="{Binding HotkeyText}" FontFamily="Consolas" FontSize="12"
+                                               Foreground="{StaticResource AppTextSecondaryBrush}" />
+                                </Border>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <Border x:Name="Toast" Grid.Row="2" Margin="16,0,16,16" VerticalAlignment="Bottom"
+                Padding="12,8" CornerRadius="6" Visibility="Collapsed"
+                Background="#E61E1E1E"
+                BorderBrush="{StaticResource AppBorderBrush}" BorderThickness="1"
+                IsHitTestVisible="False">
+            <TextBlock x:Name="ToastText" FontSize="12" TextWrapping="Wrap"
+                       Foreground="{StaticResource AppTextPrimaryBrush}" />
+        </Border>
+
+        <Grid Grid.Row="3" Margin="16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Button x:Name="CaptureButton" Content="抓取当前曲线" Height="36"
+                    HorizontalAlignment="Stretch" Click="CaptureButton_Click" />
+            <Button Grid.Column="1" Content="配置文件" Height="36" Margin="8,0,0,0"
+                    Click="OpenConfig_Click" />
+        </Grid>
+    </Grid>
+</ui:FluentWindow>

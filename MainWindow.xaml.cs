@@ -1,0 +1,343 @@
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Threading;
+using MoonDropEQ.Core;
+using MoonDropEQ.Models;
+using MoonDropEQ.Services;
+using Wpf.Ui.Controls;
+
+namespace MoonDropEQ;
+
+public partial class MainWindow : FluentWindow
+{
+    private readonly PresetStore _store = new();
+    private readonly ObservableCollection<PresetItem> _items = new();
+    private readonly DispatcherTimer _toastTimer;
+
+    private HotkeyService? _hotkeys;
+    private TrayService? _tray;
+    private RaysDevice? _device;
+    private Preset? _lastCurve;
+    private bool _busy;
+    private bool _exiting;
+
+    public MainWindow()
+    {
+        InitializeComponent();
+
+        _toastTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
+        _toastTimer.Tick += (_, _) =>
+        {
+            _toastTimer.Stop();
+            Toast.Visibility = Visibility.Collapsed;
+        };
+
+        _store.Load();
+        PresetList.ItemsSource = _items;
+        RefreshItems();
+
+        SourceInitialized += (_, _) => SetupInfrastructure();
+        Loaded += async (_, _) => await DetectDeviceAsync();
+        Closing += OnWindowClosing;
+    }
+
+    private void SetupInfrastructure()
+    {
+        _hotkeys = new HotkeyService(this);
+
+        _tray = new TrayService();
+        _tray.ShowRequested += ShowFromTray;
+        _tray.ExitRequested += ExitApplication;
+        _tray.PresetRequested += preset => _ = ApplyPresetAsync(preset);
+        _tray.Update(_store.Presets);
+
+        RegisterHotkeys();
+    }
+
+    private void RegisterHotkeys()
+    {
+        if (_hotkeys is null)
+        {
+            return;
+        }
+
+        _hotkeys.UnregisterAll();
+        var failures = new List<string>();
+
+        foreach (var preset in _store.Presets)
+        {
+            if (string.IsNullOrWhiteSpace(preset.Hotkey))
+            {
+                continue;
+            }
+
+            var captured = preset;
+            if (!_hotkeys.TryRegister(captured.Hotkey, () => _ = ApplyPresetAsync(captured), out var error))
+            {
+                failures.Add($"{captured.Name}（{error}）");
+            }
+        }
+
+        if (failures.Count > 0)
+        {
+            ShowToast("部分热键未生效：" + string.Join("、", failures), true);
+        }
+    }
+
+    private async Task DetectDeviceAsync()
+    {
+        UpdateConnection(null, "正在查找耳机…");
+
+        var found = await Task.Run(RaysDevice.TryOpen);
+        if (found is null)
+        {
+            UpdateConnection(false, "未连接（插上耳机后重试一次应用）");
+            return;
+        }
+
+        _device = found;
+        UpdateConnection(true, "已连接 · MOONDROP Rays");
+        await RefreshActiveAsync();
+    }
+
+    private RaysDevice? EnsureDevice()
+    {
+        if (_device is not null)
+        {
+            return _device;
+        }
+
+        _device = RaysDevice.TryOpen();
+        UpdateConnection(_device is not null, _device is null ? "未连接" : "已连接 · MOONDROP Rays");
+        return _device;
+    }
+
+    private async Task RefreshActiveAsync()
+    {
+        var device = _device;
+        if (device is null)
+        {
+            return;
+        }
+
+        var index = await Task.Run(device.ReadIndex);
+        if (index is null)
+        {
+            return;
+        }
+
+        Preset? active = null;
+        if (index == RaysDevice.PeqSlot)
+        {
+            active = _lastCurve;
+        }
+        else
+        {
+            active = _store.Presets.FirstOrDefault(p => p.Kind == PresetKind.BuiltIn && p.Index == index);
+        }
+
+        SetActive(active);
+    }
+
+    private async Task ApplyPresetAsync(Preset preset)
+    {
+        if (_busy)
+        {
+            return;
+        }
+
+        _busy = true;
+        try
+        {
+            var device = EnsureDevice();
+            if (device is null)
+            {
+                ShowToast("未检测到耳机，请确认已插好", true);
+                return;
+            }
+
+            await Task.Run(() => PresetApplier.Apply(device, preset));
+
+            if (preset.Kind == PresetKind.Curve)
+            {
+                _lastCurve = preset;
+            }
+
+            SetActive(preset);
+            ShowToast($"已应用：{preset.Name}");
+        }
+        catch (Exception ex)
+        {
+            _device?.Dispose();
+            _device = null;
+            UpdateConnection(false, "连接中断，请重新插拔耳机");
+            ShowToast($"应用失败：{ex.Message}", true);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async void CaptureButton_Click(object sender, RoutedEventArgs e)
+    {
+        var device = EnsureDevice();
+        if (device is null)
+        {
+            ShowToast("未检测到耳机，请确认已插好", true);
+            return;
+        }
+
+        CaptureButton.IsEnabled = false;
+        try
+        {
+            var bands = await Task.Run(device.ReadAllBands);
+            if (bands is null)
+            {
+                ShowToast("读取曲线失败，请在官网应用一次后再试", true);
+                return;
+            }
+
+            var preGain = await Task.Run(device.ReadPreGainDb);
+            var globalGain = await Task.Run(device.ReadGlobalGainDb);
+
+            var suggested = $"曲线 {_store.Presets.Count(p => p.Kind == PresetKind.Curve) + 1}";
+            var name = RenameDialog.Show(this, "抓取当前曲线", "给这条曲线起个名字，方便之后用热键切换：", suggested);
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return;
+            }
+
+            var preset = new Preset
+            {
+                Name = name.Trim(),
+                Kind = PresetKind.Curve,
+                Bands = bands.ToList(),
+                PreGainDb = preGain,
+                GlobalGainDb = globalGain,
+                Hotkey = _store.NextHotkey()
+            };
+
+            _store.Presets.Add(preset);
+            _store.Save();
+
+            _lastCurve = preset;
+            RefreshItems();
+            RegisterHotkeys();
+            _tray?.Update(_store.Presets);
+            SetActive(preset);
+            ShowToast($"已保存：{preset.Name}");
+        }
+        catch (Exception ex)
+        {
+            ShowToast($"抓取失败：{ex.Message}", true);
+        }
+        finally
+        {
+            CaptureButton.IsEnabled = true;
+        }
+    }
+
+    private void OpenConfig_Click(object sender, RoutedEventArgs e)
+    {
+        _store.Save();
+        Process.Start(new ProcessStartInfo("explorer.exe", $"/select,\"{_store.FilePath}\"")
+        {
+            UseShellExecute = true
+        });
+    }
+
+    private void PresetCard_Click(object sender, MouseButtonEventArgs e)
+    {
+        if (sender is FrameworkElement { Tag: PresetItem item })
+        {
+            _ = ApplyPresetAsync(item.Model);
+        }
+    }
+
+    private void RefreshItems()
+    {
+        _items.Clear();
+        foreach (var preset in _store.Presets)
+        {
+            _items.Add(new PresetItem(preset));
+        }
+    }
+
+    private void SetActive(Preset? preset)
+    {
+        foreach (var item in _items)
+        {
+            item.IsActive = preset is not null && item.Model.Id == preset.Id;
+        }
+
+        if (preset is null)
+        {
+            ActiveText.Text = string.Empty;
+        }
+        else
+        {
+            ActiveText.Text = $"当前：{preset.Name}";
+        }
+    }
+
+    private void UpdateConnection(bool? connected, string message)
+    {
+        StatusText.Text = message;
+        StatusDot.Fill = connected switch
+        {
+            true => (System.Windows.Media.Brush)FindResource("AppSuccessBrush"),
+            false => (System.Windows.Media.Brush)FindResource("AppDangerBrush"),
+            _ => (System.Windows.Media.Brush)FindResource("AppTextTertiaryBrush")
+        };
+    }
+
+    private void ShowToast(string message, bool isError = false)
+    {
+        ToastText.Text = message;
+        ToastText.Foreground = (System.Windows.Media.Brush)FindResource(
+            isError ? "AppDangerBrush" : "AppTextPrimaryBrush");
+        Toast.Visibility = Visibility.Visible;
+        _toastTimer.Stop();
+        _toastTimer.Start();
+    }
+
+    private void ShowFromTray()
+    {
+        Show();
+        WindowState = WindowState.Normal;
+        Activate();
+    }
+
+    private void ExitApplication()
+    {
+        _exiting = true;
+        DisposeInfrastructure();
+        Application.Current.Shutdown();
+    }
+
+    private void DisposeInfrastructure()
+    {
+        _hotkeys?.Dispose();
+        _hotkeys = null;
+        _tray?.Dispose();
+        _tray = null;
+        _device?.Dispose();
+        _device = null;
+    }
+
+    private void OnWindowClosing(object? sender, CancelEventArgs e)
+    {
+        if (_exiting)
+        {
+            return;
+        }
+
+        e.Cancel = true;
+        Hide();
+    }
+}
