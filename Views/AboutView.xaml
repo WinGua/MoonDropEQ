@@ -25,6 +25,11 @@
                            Foreground="{DynamicResource AppTextSecondaryBrush}"
                            Text="水月雨 MOONDROP Rays（光束）的桌面 EQ 预设遥控器：把官网的「选设备 → 开始使用 → 挑预设 → 应用」压缩成一次点击或一个热键。" />
 
+                <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                    <Button Content="GitHub 仓库" Height="32" Padding="14,0" Click="Repo_Click" />
+                    <Button Content="问题反馈" Height="32" Padding="14,0" Margin="8,0,0,0" Click="Issues_Click" />
+                </StackPanel>
+
                 <TextBlock Margin="0,18,0,8" Text="快速上手" FontSize="14"
                            Foreground="{DynamicResource AppTextPrimaryBrush}" />
 
