@@ -23,10 +23,39 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Restore
-        run: dotnet restore MoonDropEQ.csproj
+        shell: pwsh
+        run: |
+          dotnet --info
+          dotnet restore MoonDropEQ.csproj 2>&1 | Tee-Object -FilePath restore.log
+          exit $LASTEXITCODE
+
+      - name: Surface restore errors
+        if: failure()
+        shell: pwsh
+        run: |
+          if (Test-Path restore.log) {
+            Get-Content restore.log -Tail 40 | ForEach-Object { Write-Host "::error::$_" }
+          } else {
+            Write-Host "::error::restore.log not found"
+          }
+          exit 1
 
       - name: Publish
-        run: dotnet publish MoonDropEQ.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o publish
+        shell: pwsh
+        run: |
+          dotnet publish MoonDropEQ.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o publish 2>&1 | Tee-Object -FilePath publish.log
+          exit $LASTEXITCODE
+
+      - name: Surface publish errors
+        if: failure()
+        shell: pwsh
+        run: |
+          if (Test-Path publish.log) {
+            Get-Content publish.log -Tail 40 | ForEach-Object { Write-Host "::error::$_" }
+          } else {
+            Write-Host "::error::publish.log not found"
+          }
+          exit 1
 
       - name: Package
         run: Compress-Archive -Path publish/* -DestinationPath MoonDropEQ-win-x64.zip -Force
