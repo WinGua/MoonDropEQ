@@ -14,6 +14,7 @@ public partial class AboutView : UserControl
     private const string ReleasesPage = "https://github.com/WinGua/MoonDropEQ/releases";
     private const string RepositoryPage = "https://github.com/WinGua/MoonDropEQ";
     private const string IssuesPage = "https://github.com/WinGua/MoonDropEQ/issues";
+    private const string SupportedDevicesPage = "https://github.com/WinGua/MoonDropEQ#supported-devices";
 
     private string _downloadUrl = ReleasesPage;
 
@@ -80,6 +81,11 @@ public partial class AboutView : UserControl
         {
             CheckButton.IsEnabled = true;
         }
+    }
+
+    private void SupportedDevices_Click(object sender, RoutedEventArgs e)
+    {
+        Process.Start(new ProcessStartInfo(SupportedDevicesPage) { UseShellExecute = true });
     }
 
     private void Repo_Click(object sender, RoutedEventArgs e)
