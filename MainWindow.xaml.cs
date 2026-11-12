@@ -303,19 +303,19 @@ public partial class MainWindow : FluentWindow
 
         e.Handled = true;
 
-        var menu = new ContextMenu();
+        var menu = new System.Windows.Controls.ContextMenu();
 
-        var rename = new MenuItem { Header = "重命名" };
+        var rename = new System.Windows.Controls.MenuItem { Header = "重命名" };
         rename.Click += (_, _) => RenamePreset(item.Model);
         menu.Items.Add(rename);
 
-        var hotkey = new MenuItem { Header = "设置热键…" };
+        var hotkey = new System.Windows.Controls.MenuItem { Header = "设置热键…" };
         hotkey.Click += (_, _) => EditHotkey(item.Model);
         menu.Items.Add(hotkey);
 
-        menu.Items.Add(new Separator());
+        menu.Items.Add(new System.Windows.Controls.Separator());
 
-        var remove = new MenuItem { Header = "删除" };
+        var remove = new System.Windows.Controls.MenuItem { Header = "删除" };
         remove.Click += (_, _) => DeletePreset(item.Model);
         menu.Items.Add(remove);
 
@@ -376,13 +376,13 @@ public partial class MainWindow : FluentWindow
 
     private void DeletePreset(Preset preset)
     {
-        var result = MessageBox.Show(
+        var result = System.Windows.MessageBox.Show(
             $"确定删除「{preset.Name}」吗？\n\n只会从本地列表移除，不会改动耳机内的设置。",
             "删除预设",
-            MessageBoxButton.OKCancel,
-            MessageBoxImage.Question);
+            System.Windows.MessageBoxButton.OKCancel,
+            System.Windows.MessageBoxImage.Question);
 
-        if (result != MessageBoxResult.OK)
+        if (result != System.Windows.MessageBoxResult.OK)
         {
             return;
         }
