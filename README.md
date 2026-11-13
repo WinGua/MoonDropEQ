@@ -153,7 +153,13 @@
 
 ## 许可证
 
-本项目使用 [MIT License](LICENSE)。第三方组件许可见 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。
+本项目使用 [GNU General Public License v3.0](LICENSE)。
+
+你可以自由使用、修改和分发本项目；如果对外分发修改后的版本，必须以 GPL-3.0 继续开源并提供对应源代码。仅自行修改、不对外分发不受限制。
+
+Copyright (C) 2026 WinGua
+
+第三方组件许可见 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。
 
 ## 免责声明
 
