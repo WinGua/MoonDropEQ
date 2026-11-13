@@ -24,7 +24,7 @@ public partial class AboutView : UserControl
 
         var version = Assembly.GetExecutingAssembly().GetName().Version;
         VersionText.Text = version is null
-            ? "v0.2.1"
+            ? "v0.3.0"
             : $"v{version.Major}.{version.Minor}.{version.Build}";
     }
 
