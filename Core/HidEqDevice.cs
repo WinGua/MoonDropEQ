@@ -193,7 +193,12 @@ public sealed class HidEqDevice : IDisposable
         }
 
         var payload = Payload(response);
-        return payload.Length < 2 ? 0 : BitConverter.ToInt16(payload, 0);
+        if (payload.Length < 2)
+        {
+            return 0;
+        }
+
+        return BitConverter.ToInt16(payload, 0);
     }
 
     private void Send(byte command, byte[] payload)
