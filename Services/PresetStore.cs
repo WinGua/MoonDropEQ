@@ -58,6 +58,7 @@ public sealed class PresetStore
                     {
                         if (string.IsNullOrWhiteSpace(preset.DeviceId))
                         {
+                            // v1 预设来自仅支持 Rays 的版本
                             preset.DeviceId = "rays";
                             needsSave = true;
                         }

@@ -16,19 +16,19 @@ public sealed class DeviceProfile
 
     public List<string> ProductIds { get; set; } = new();
 
-    public string ReportId { get; set; } = "0x00";
+    public string ReportId { get; set; } = string.Empty;
 
-    public string ReadOp { get; set; } = "0x80";
+    public string ReadOp { get; set; } = string.Empty;
 
-    public string WriteOp { get; set; } = "0x01";
+    public string WriteOp { get; set; } = string.Empty;
 
-    public int BandCount { get; set; } = 8;
+    public int BandCount { get; set; }
 
-    public int BandPayloadSize { get; set; } = 33;
+    public int BandPayloadSize { get; set; }
 
-    public int CurveSlot { get; set; } = 7;
+    public int CurveSlot { get; set; } = -1;
 
-    public double GainScale { get; set; } = 256;
+    public double GainScale { get; set; }
 
     public List<SlotProfile> Slots { get; set; } = new();
 
@@ -72,6 +72,8 @@ public sealed class DeviceProfile
         && ParseHex(WriteOp) >= 0
         && BandCount > 0
         && BandPayloadSize > 0
+        && CurveSlot >= 0
+        && GainScale > 0
         && Commands.IsValid;
 
     public bool Matches(int vendorId, int productId)

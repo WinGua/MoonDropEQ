@@ -114,11 +114,11 @@ foreach ($profile in $profiles) {
         Add-Error $label 'writeOp 格式错误'
     }
 
-    if (-not (Test-Integer $profile.bandCount) -or [int64]$profile.bandCount -le 0) {
-        Add-Error $label 'bandCount 必须是正整数'
+    if (-not (Test-Integer $profile.bandCount) -or [int64]$profile.bandCount -lt 1 -or [int64]$profile.bandCount -gt 32) {
+        Add-Error $label 'bandCount 必须是 1 到 32 的整数'
     }
-    if (-not (Test-Integer $profile.bandPayloadSize) -or [int64]$profile.bandPayloadSize -le 0) {
-        Add-Error $label 'bandPayloadSize 必须是正整数'
+    if (-not (Test-Integer $profile.bandPayloadSize) -or [int64]$profile.bandPayloadSize -lt 1 -or [int64]$profile.bandPayloadSize -gt 128) {
+        Add-Error $label 'bandPayloadSize 必须是 1 到 128 的整数'
     }
     if (-not (Test-Integer $profile.curveSlot) -or [int64]$profile.curveSlot -lt 0) {
         Add-Error $label 'curveSlot 必须是非负整数'

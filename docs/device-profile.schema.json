@@ -15,6 +15,7 @@
     "bandCount",
     "bandPayloadSize",
     "curveSlot",
+    "gainScale",
     "commands",
     "capabilities",
     "timing"

@@ -71,8 +71,6 @@ public sealed class CaptureRules
 {
     public bool Known { get; set; }
 
-    public int BandPayloadSize { get; set; }
-
     public int[]? BuiltIn { get; set; }
 
     public int[]? Band { get; set; }
@@ -89,7 +87,6 @@ public sealed class CaptureRules
         return new CaptureRules
         {
             Known = true,
-            BandPayloadSize = profile.BandPayloadSize,
             BuiltIn = profile.Capabilities.BuiltInSlots
                 ? new[] { (int)profile.WriteOpValue, (int)profile.Commands.EqIndexValue, 1 }
                 : null,

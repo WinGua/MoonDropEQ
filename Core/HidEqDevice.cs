@@ -38,13 +38,14 @@ public sealed class HidEqDevice : IDisposable
 
             var outLength = device.GetMaxOutputReportLength();
             var inLength = device.GetMaxInputReportLength();
-            if (outLength < profile.BandPayloadSize + 4)
+            var minimumLength = Math.Max(64, profile.BandPayloadSize + 4);
+            if (outLength < minimumLength)
             {
-                outLength = 64;
+                outLength = minimumLength;
             }
-            if (inLength < 64)
+            if (inLength < minimumLength)
             {
-                inLength = 64;
+                inLength = minimumLength;
             }
 
             var result = new HidEqDevice(profile, stream, outLength, inLength);
