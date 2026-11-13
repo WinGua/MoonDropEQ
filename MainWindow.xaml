@@ -30,6 +30,7 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
+
     </ui:FluentWindow.Resources>
 
     <Grid>
@@ -144,7 +145,20 @@
                     <TextBlock Text="设置" FontSize="16" Margin="12,0,0,0" VerticalAlignment="Center"
                                Foreground="{DynamicResource AppTextPrimaryBrush}" />
                 </StackPanel>
-                <views:SettingsView Grid.Row="1" />
+                <views:SettingsView x:Name="SettingsPage" Grid.Row="1" />
+            </Grid>
+
+            <Grid x:Name="DeviceHost" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="16,4,16,10">
+                    <Button Content="← 返回" Height="32" Padding="12,0" Click="Back_Click" />
+                    <TextBlock Text="设备适配" FontSize="16" Margin="12,0,0,0" VerticalAlignment="Center"
+                               Foreground="{DynamicResource AppTextPrimaryBrush}" />
+                </StackPanel>
+                <views:DeviceAdapterView x:Name="DevicePage" Grid.Row="1" />
             </Grid>
 
             <Grid x:Name="AboutHost" Visibility="Collapsed">
@@ -164,18 +178,22 @@
         <Grid x:Name="FooterPanel" Grid.Row="2" Margin="16">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <Button x:Name="CaptureButton" Content="抓取当前曲线" Height="36"
-                    HorizontalAlignment="Stretch" Click="CaptureButton_Click" />
-            <Button Grid.Column="1" Content="配置文件" Height="36" Margin="8,0,0,0"
-                    Click="OpenConfig_Click" />
-            <Button Grid.Column="2" Content="设置" Height="36" Margin="8,0,0,0"
-                    Click="Settings_Click" />
-            <Button Grid.Column="3" Content="关于" Height="36" Margin="8,0,0,0"
-                    Click="About_Click" />
+            <ui:Button x:Name="CaptureButton" Content="抓取曲线" Height="36"
+                       Appearance="Primary" HorizontalAlignment="Stretch"
+                       Click="CaptureButton_Click" />
+            <ui:Button Grid.Column="1" Content="设备适配" Height="36" Margin="8,0,0,0"
+                       Appearance="Secondary" HorizontalAlignment="Stretch"
+                       Click="Device_Click" />
+            <ui:Button Grid.Column="2" Content="设置" Height="36" Margin="8,0,0,0"
+                       Appearance="Secondary" HorizontalAlignment="Stretch"
+                       Click="Settings_Click" />
+            <ui:Button Grid.Column="3" Content="关于" Height="36" Margin="8,0,0,0"
+                       Appearance="Secondary" HorizontalAlignment="Stretch"
+                       Click="About_Click" />
         </Grid>
     </Grid>
 </ui:FluentWindow>

@@ -41,6 +41,7 @@ public partial class MainWindow : FluentWindow
         _store.Load();
         PresetList.ItemsSource = _items;
         RefreshItems();
+        SettingsPage.OpenPresetFileRequested += (_, _) => OpenPresetFile();
 
         SourceInitialized += (_, _) => SetupInfrastructure();
         Loaded += async (_, _) => await DetectDeviceAsync();
@@ -209,7 +210,7 @@ public partial class MainWindow : FluentWindow
             var globalGain = await Task.Run(device.ReadGlobalGainDb);
 
             var suggested = $"曲线 {_store.Presets.Count(p => p.Kind == PresetKind.Curve) + 1}";
-            var name = RenameDialog.Show(this, "抓取当前曲线", "给这条曲线起个名字，方便之后用热键切换：", suggested);
+            var name = RenameDialog.Show(this, "抓取曲线", "给这条曲线起个名字，方便之后用热键切换：", suggested);
             if (string.IsNullOrWhiteSpace(name))
             {
                 return;
@@ -245,13 +246,19 @@ public partial class MainWindow : FluentWindow
         }
     }
 
-    private void OpenConfig_Click(object sender, RoutedEventArgs e)
+    private void OpenPresetFile()
     {
         _store.Save();
         Process.Start(new ProcessStartInfo("explorer.exe", $"/select,\"{_store.FilePath}\"")
         {
             UseShellExecute = true
         });
+    }
+
+    private void Device_Click(object sender, RoutedEventArgs e)
+    {
+        DevicePage.RefreshStatus();
+        ShowPage(DeviceHost);
     }
 
     private void Settings_Click(object sender, RoutedEventArgs e)
@@ -267,6 +274,7 @@ public partial class MainWindow : FluentWindow
     private void Back_Click(object sender, RoutedEventArgs e)
     {
         SettingsHost.Visibility = Visibility.Collapsed;
+        DeviceHost.Visibility = Visibility.Collapsed;
         AboutHost.Visibility = Visibility.Collapsed;
         MainView.Visibility = Visibility.Visible;
         FooterPanel.Visibility = Visibility.Visible;
@@ -282,6 +290,7 @@ public partial class MainWindow : FluentWindow
         MainView.Visibility = Visibility.Collapsed;
         FooterPanel.Visibility = Visibility.Collapsed;
         SettingsHost.Visibility = Visibility.Collapsed;
+        DeviceHost.Visibility = Visibility.Collapsed;
         AboutHost.Visibility = Visibility.Collapsed;
         host.Visibility = Visibility.Visible;
     }

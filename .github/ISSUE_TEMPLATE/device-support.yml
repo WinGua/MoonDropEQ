@@ -1,0 +1,66 @@
+name: 设备适配请求
+description: 为尚未支持的水月雨耳机提交适配信息
+title: "[设备适配] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        请先在 MoonDropEQ 的「设备适配」页完成采集，再把 `MoonDropEQ-adapt-*.zip` 拖进本 Issue。
+
+        采集方法见 [docs/adding-device.md](https://github.com/WinGua/MoonDropEQ/blob/main/docs/adding-device.md)。
+
+  - type: input
+    id: model
+    attributes:
+      label: 设备型号
+      description: 填写官网下拉框里显示的型号名称
+      placeholder: 例如 MOONDROP Rays
+    validations:
+      required: true
+
+  - type: input
+    id: firmware
+    attributes:
+      label: 固件版本
+      description: 官网页面显示的版本号；看不到就填「未知」
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: features
+    attributes:
+      label: 设备特征
+      options:
+        - label: 官网有内置预设（默认 / 游戏等）
+        - label: 官网支持自定义曲线或收藏
+        - label: 左右声道可以分别调音
+
+  - type: textarea
+    id: presets
+    attributes:
+      label: 内置预设名称与顺序
+      description: 按官网里的顺序填写，方便确认槽位映射
+      placeholder: 默认、音乐游戏、3A 游戏、FPS1、FPS2……
+
+  - type: textarea
+    id: package
+    attributes:
+      label: 采集包
+      description: 把 MoonDropEQ-adapt-*.zip 直接拖进这里
+      placeholder: 拖入 zip 文件
+    validations:
+      required: true
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: 补充说明
+      description: 例如抓包为空、探测没有回应、网页里没有曲线板块等
+
+  - type: checkboxes
+    id: testing
+    attributes:
+      label: 后续配合
+      options:
+        - label: 我愿意下载测试构建并完成实机验证
+          required: true

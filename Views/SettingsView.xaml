@@ -36,6 +36,11 @@
             <TextBlock Margin="0,18,0,0" FontSize="12" TextWrapping="Wrap" LineHeight="18"
                        Foreground="{DynamicResource AppTextTertiaryBrush}"
                        Text="材质与主题会立即生效；设置保存在 %APPDATA%\MoonDropEQ\settings.json" />
+
+            <Border Height="1" Margin="0,16,0,16" Background="{DynamicResource AppBorderBrush}" />
+
+            <Button Content="打开预设文件位置" Height="32" Padding="14,0"
+                    HorizontalAlignment="Left" Click="OpenPresetFile_Click" />
         </StackPanel>
     </ScrollViewer>
 </UserControl>

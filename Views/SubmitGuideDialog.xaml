@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ui:FluentWindow x:Class="MoonDropEQ.Views.SubmitGuideDialog"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                 Title="采集提交"
+                 Icon="/Assets/app.png"
+                 Width="480"
+                 SizeToContent="Height"
+                 WindowStartupLocation="CenterOwner"
+                 WindowBackdropType="Mica"
+                 ExtendsContentIntoTitleBar="True"
+                 ResizeMode="NoResize"
+                 ShowInTaskbar="False">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar Grid.Row="0" Title="采集提交" ShowMaximize="False" ShowMinimize="False" />
+
+        <StackPanel Grid.Row="1" Margin="20,4,20,20">
+            <TextBlock FontSize="14" TextWrapping="Wrap" LineHeight="22"
+                       Foreground="{DynamicResource AppTextPrimaryBrush}"
+                       Text="选择一种提交方式，两种方式都需要附上采集包。" />
+
+            <TextBlock x:Name="PackageText" Margin="0,8,0,0" FontSize="12"
+                       TextWrapping="Wrap" LineHeight="18"
+                       Foreground="{DynamicResource AppTextTertiaryBrush}" />
+
+            <Button Content="提交 Issue" Height="36" Margin="0,16,0,0"
+                    HorizontalAlignment="Stretch" Click="Issue_Click" />
+            <TextBlock Margin="0,6,0,0" FontSize="12" LineHeight="18" TextWrapping="Wrap"
+                       Foreground="{DynamicResource AppTextTertiaryBrush}"
+                       Text="适合不想写代码：把 zip 拖进 Issue，作者补设备描述并发测试构建。" />
+
+            <Button Content="查看 PR 指南" Height="36" Margin="0,16,0,0"
+                    HorizontalAlignment="Stretch" Click="Pr_Click" />
+            <TextBlock Margin="0,6,0,0" FontSize="12" LineHeight="18" TextWrapping="Wrap"
+                       Foreground="{DynamicResource AppTextTertiaryBrush}"
+                       Text="适合会用 AI：按指南修改 devices.json，提交 Pull Request 并附上实机验证结果。" />
+
+            <Button Content="关闭" Height="32" Width="84" HorizontalAlignment="Right"
+                    Margin="0,20,0,0" Click="Close_Click" />
+        </StackPanel>
+    </Grid>
+</ui:FluentWindow>

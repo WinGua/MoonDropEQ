@@ -50,7 +50,7 @@
                            Text="2. 点击任意预设卡片，或按对应热键切换（默认 Ctrl+Alt+1 ~ 5）。" />
                 <TextBlock FontSize="13" LineHeight="22" TextWrapping="Wrap" Margin="0,0,0,4"
                            Foreground="{DynamicResource AppTextSecondaryBrush}"
-                           Text="3. 想加自己的曲线：先在官网应用一次，再回来点「抓取当前曲线」并命名。" />
+                           Text="3. 想加自己的曲线：先在官网应用一次，再回来点「抓取曲线」并命名。" />
                 <TextBlock FontSize="13" LineHeight="22" TextWrapping="Wrap" Margin="0,0,0,4"
                            Foreground="{DynamicResource AppTextSecondaryBrush}"
                            Text="4. 关闭窗口会收进托盘，热键依然可用；托盘图标单击唤回窗口。" />

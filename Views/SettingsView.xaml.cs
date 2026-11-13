@@ -1,3 +1,4 @@
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using MoonDropEQ.Models;
@@ -8,6 +9,8 @@ namespace MoonDropEQ.Views;
 public partial class SettingsView : UserControl
 {
     private bool _loading;
+
+    public event EventHandler? OpenPresetFileRequested;
 
     public SettingsView()
     {
@@ -41,6 +44,11 @@ public partial class SettingsView : UserControl
         change(settings);
         ThemeService.Apply(settings);
         SettingsStore.Save(settings);
+    }
+
+    private void OpenPresetFile_Click(object sender, RoutedEventArgs e)
+    {
+        OpenPresetFileRequested?.Invoke(this, EventArgs.Empty);
     }
 
     private void CloseToTray_Checked(object sender, RoutedEventArgs e)

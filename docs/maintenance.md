@@ -207,9 +207,11 @@ print("index =", send(dev, 0x80, 0x0F)[4])
 | 新增/改名命令字 | `RaysDevice` 的 `Cmd*` 常量 + `PresetApplier` 时序 |
 | 载荷长度变化 | `RaysDevice.BandPayloadSize`、`BandCount` |
 | 槽位映射变化 | `RaysDevice.PeqSlot`、`PresetStore.CreateDefaults()` |
-| 增加新机型 | 需要把上述参数抽成设备描述（见下） |
+| 增加新机型 | 先按 [adding-device.md](adding-device.md) 采集真实报文，再把参数抽成设备描述 |
 
-**建议的演进方向**：把 `VID/PID/reportId/命令字/载荷长度/槽位表` 抽成 `devices.json` + `DeviceProfile` 类，`RaysDevice` 改为按 profile 工作。当前是单机型硬编码，改动量小但多机型会重复。
+**演进方向**：把 `VID/PID/reportId/命令字/载荷长度/槽位表` 抽成 `devices.json` + `DeviceProfile` 类，`RaysDevice` 改为按 profile 工作。当前是单机型硬编码，改动量小但多机型会重复。
+
+新机型的采集、提交和验证流程见 [adding-device.md](adding-device.md)。
 
 ---
 
