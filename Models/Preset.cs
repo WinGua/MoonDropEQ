@@ -27,7 +27,7 @@ public sealed class Preset
 
     public double GlobalGainDb { get; set; }
 
-    /// <summary>8 段 PEQ 原始载荷，每段 33 字节的十六进制字符串。</summary>
+    /// <summary>PEQ 原始载荷，段数与单段字节数由设备描述决定。</summary>
     public List<string> Bands { get; set; } = new();
 
     public string Hotkey { get; set; } = string.Empty;

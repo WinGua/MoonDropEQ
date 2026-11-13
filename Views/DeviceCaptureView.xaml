@@ -35,7 +35,7 @@
                        Text="○ 内置预设（默认）" />
             <TextBlock x:Name="CurveCheck" FontSize="13" Margin="0,0,0,4"
                        Foreground="{DynamicResource AppTextTertiaryBrush}"
-                       Text="○ 自定义曲线（8 段 + 提交）" />
+                       Text="○ 自定义曲线" />
             <TextBlock x:Name="SavedCheck" FontSize="13"
                        Foreground="{DynamicResource AppTextTertiaryBrush}"
                        Text="○ 保存命令" />

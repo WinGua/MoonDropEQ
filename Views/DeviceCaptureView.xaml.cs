@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -19,6 +18,9 @@ public partial class DeviceCaptureView : UserControl
 
     private CancellationTokenSource? _cts;
     private Task? _pollTask;
+    private DeviceProfile? _profile;
+    private string _builtInLabel = "内置预设（默认）";
+    private string _curveLabel = "自定义曲线";
     private int _frameCount;
     private bool _started;
     private bool _packaging;
@@ -34,15 +36,14 @@ public partial class DeviceCaptureView : UserControl
     {
         Stop();
         _session = new HidCaptureSession();
+        _profile = null;
         _frameCount = 0;
         _started = false;
         _packaging = false;
 
         StatusText.Text = "请先插好耳机，然后点「开始采集」。";
         DetailText.Text = "等待开始。";
-        ResetCheck(BuiltInCheck, "内置预设（默认）");
-        ResetCheck(CurveCheck, "自定义曲线（8 段 + 提交）");
-        ResetCheck(SavedCheck, "保存命令");
+        ApplyLabels();
 
         StartButton.Visibility = Visibility.Visible;
         StartButton.IsEnabled = true;
@@ -87,7 +88,11 @@ public partial class DeviceCaptureView : UserControl
                 }
                 else
                 {
-                    SetStatus($"已识别：{best.DisplayName}");
+                    _profile = DeviceRegistry.Match(best.VendorId, best.ProductId);
+                    ApplyLabels();
+                    SetStatus(_profile is null
+                        ? $"已识别：{best.DisplayName}（新机型）"
+                        : $"已识别：{best.DisplayName}（{_profile.Name}）");
                     DetailText.Text =
                         $"VID 0x{best.VendorId:X4} / PID 0x{best.ProductId:X4}，输出报文长度 {best.MaxOutputReportLength}。";
                 }
@@ -101,8 +106,17 @@ public partial class DeviceCaptureView : UserControl
             SetStatus("即将打开浏览器…");
             await _session.StartAsync(_cts.Token);
 
-            SetStatus("请在网页里连接耳机，并应用一次「默认」预设。");
-            DetailText.Text = "连接后先应用「默认」，再应用一条「自定义 / 收藏」曲线。两者都需要采集。";
+            var needBuiltIn = _profile is null || _profile.Capabilities.BuiltInSlots;
+            var needCurve = _profile is null || _profile.Capabilities.Curve;
+            SetStatus(needBuiltIn
+                ? "请在网页里连接耳机，并应用一次「默认」预设。"
+                : "请在网页里连接耳机，并应用一条「自定义 / 收藏」曲线。");
+            DetailText.Text = (needBuiltIn, needCurve) switch
+            {
+                (true, true) => "连接后先应用「默认」，再应用一条「自定义 / 收藏」曲线。两者都需要采集。",
+                (false, true) => "连接后应用一条「自定义 / 收藏」曲线即可。",
+                _ => "连接后应用一次「默认」预设即可。"
+            };
             _pollTask = PollAsync();
         }
         catch (OperationCanceledException)
@@ -128,10 +142,20 @@ public partial class DeviceCaptureView : UserControl
             try
             {
                 await Task.Delay(700, token);
-                var snapshot = await _session.SnapshotAsync(token);
+                var snapshot = await _session.SnapshotAsync(CaptureRules.FromProfile(_profile), token);
                 if (!snapshot.Ok)
                 {
                     continue;
+                }
+
+                if (_profile is null && snapshot.Devices.Count > 0)
+                {
+                    var web = snapshot.Devices[0];
+                    _profile = DeviceRegistry.Match(web.VendorId, web.ProductId);
+                    if (_profile is not null)
+                    {
+                        ApplyLabels();
+                    }
                 }
 
                 _frameCount = snapshot.Frames;
@@ -142,17 +166,22 @@ public partial class DeviceCaptureView : UserControl
 
                 FinishButton.IsEnabled = snapshot.Frames > 0;
 
-                if (snapshot.BuiltIn && snapshot.Curve)
+                var needBuiltIn = _profile is null || _profile.Capabilities.BuiltInSlots;
+                var needCurve = _profile is null || _profile.Capabilities.Curve;
+
+                if ((!needBuiltIn || snapshot.BuiltIn) && (!needCurve || snapshot.Curve))
                 {
-                    SetStatus("两条流程都已采集，可以点「完成采集」。");
+                    SetStatus("需要采集的流程都已完成，可以点「完成采集」。");
                 }
-                else if (snapshot.BuiltIn)
+                else if (needCurve && !snapshot.Curve)
                 {
-                    SetStatus("已采集内置预设。请再应用一条「自定义 / 收藏」曲线。");
+                    SetStatus(snapshot.BuiltIn
+                        ? "已采集内置预设。请再应用一条「自定义 / 收藏」曲线。"
+                        : "请在网页里应用一次「默认」预设，再应用一条「自定义 / 收藏」曲线。");
                 }
                 else
                 {
-                    SetStatus("请在网页里连接耳机，并应用一次「默认」预设。");
+                    SetStatus("请再应用一次「默认」预设。");
                 }
             }
             catch (OperationCanceledException)
@@ -237,12 +266,13 @@ public partial class DeviceCaptureView : UserControl
                 Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
             };
 
+            var rules = CaptureRules.FromProfile(_profile);
             var zipPath = CaptureStorage.CreatePackage(zipName, new (string, string)[]
             {
                 ("capture.json", JsonSerializer.Serialize(log, jsonOptions)),
                 ("probe.json", JsonSerializer.Serialize(probe, jsonOptions)),
                 ("device.txt", BuildDeviceText(device, probe, log)),
-                ("summary.md", BuildSummary(device, probe, log, zipName)),
+                ("summary.md", BuildSummary(device, probe, log, zipName, rules)),
                 ("README.txt", BuildReadme())
             });
 
@@ -282,9 +312,24 @@ public partial class DeviceCaptureView : UserControl
 
     private void UpdateChecklist(CaptureSnapshot snapshot)
     {
-        SetCheck(BuiltInCheck, snapshot.BuiltIn, "内置预设（默认）");
-        SetCheck(CurveCheck, snapshot.Curve, "自定义曲线（8 段 + 提交）");
+        SetCheck(BuiltInCheck, snapshot.BuiltIn, _builtInLabel);
+        SetCheck(CurveCheck, snapshot.Curve, _curveLabel);
         SetCheck(SavedCheck, snapshot.Saved, "保存命令");
+    }
+
+    private void ApplyLabels()
+    {
+        _builtInLabel = _profile is { Capabilities.BuiltInSlots: false }
+            ? "内置预设（该机型未标注支持）"
+            : "内置预设（默认）";
+
+        var bands = _profile is null ? "逐段写入" : $"{_profile.BandCount} 段";
+        var commit = _profile is null || _profile.Capabilities.NeedsCommit ? " + 提交" : string.Empty;
+        _curveLabel = $"自定义曲线（{bands}{commit}）";
+
+        ResetCheck(BuiltInCheck, _builtInLabel);
+        ResetCheck(CurveCheck, _curveLabel);
+        ResetCheck(SavedCheck, "保存命令");
     }
 
     private void SetCheck(TextBlock target, bool done, string label)
@@ -336,8 +381,10 @@ public partial class DeviceCaptureView : UserControl
         WebHidDeviceInfo? device,
         ProbeReport probe,
         CaptureLog log,
-        string zipName)
+        string zipName,
+        CaptureRules rules)
     {
+        var checks = CaptureRules.Evaluate(log, rules);
         var builder = new StringBuilder();
         builder.AppendLine("# MoonDropEQ 设备适配采集摘要");
         builder.AppendLine();
@@ -347,12 +394,9 @@ public partial class DeviceCaptureView : UserControl
             $"- 官网设备：{(device is null ? "未识别" : $"{device.ProductName}（VID 0x{device.VendorId:X4} / PID 0x{device.ProductId:X4}）")}");
         builder.AppendLine();
         builder.AppendLine("## 已采集流程");
-        builder.AppendLine(
-            $"- 内置预设（默认）：{(log.Frames.Any(frame => StartsWith(frame, 0x01, 0x0F, 0x01)) ? "有" : "无")}");
-        builder.AppendLine(
-            $"- 自定义曲线：{(log.Frames.Any(frame => StartsWith(frame, 0x01, 0x0A)) ? "有" : "无")}");
-        builder.AppendLine(
-            $"- 保存命令：{(log.Frames.Any(frame => StartsWith(frame, 0x01, 0x01, 0x00)) ? "有" : "无")}");
+        builder.AppendLine($"- 内置预设（默认）：{(checks.BuiltIn ? "有" : "无")}");
+        builder.AppendLine($"- 自定义曲线：{(checks.Curve ? "有" : "无")}");
+        builder.AppendLine($"- 保存命令：{(checks.Saved ? "有" : "无")}");
         builder.AppendLine();
         builder.AppendLine("## 读取探测");
         builder.AppendLine("- 只读：是（未发送任何写入命令）");
@@ -399,29 +443,5 @@ public partial class DeviceCaptureView : UserControl
             string.Empty,
             "隐私：采集包不包含账号、页面内容或设备序列号，只记录 HID 报文。"
         });
-    }
-
-    private static bool StartsWith(CaptureFrame frame, params byte[] expected)
-    {
-        var parts = frame.Data.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        if (parts.Length < expected.Length)
-        {
-            return false;
-        }
-
-        for (var index = 0; index < expected.Length; index++)
-        {
-            if (!byte.TryParse(
-                    parts[index],
-                    NumberStyles.HexNumber,
-                    CultureInfo.InvariantCulture,
-                    out var value)
-                || value != expected[index])
-            {
-                return false;
-            }
-        }
-
-        return true;
     }
 }

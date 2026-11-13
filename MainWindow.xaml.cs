@@ -22,7 +22,7 @@ public partial class MainWindow : FluentWindow, IUiScalable
     private HotkeyService? _hotkeys;
     private TrayService? _tray;
     private HidEqDevice? _device;
-    private string _activeDeviceId = "rays";
+    private string _activeDeviceId = string.Empty;
     private Preset? _lastCurve;
     private Preset? _activePreset;
     private bool _busy;
@@ -45,7 +45,7 @@ public partial class MainWindow : FluentWindow, IUiScalable
 
         _store.Load();
         var defaultProfile = DeviceRegistry.DefaultProfile;
-        _activeDeviceId = defaultProfile?.Id ?? "rays";
+        _activeDeviceId = defaultProfile?.Id ?? string.Empty;
         if (defaultProfile is not null)
         {
             _store.EnsureDefaultsForDevice(defaultProfile);

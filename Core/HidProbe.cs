@@ -82,6 +82,17 @@ public static class HidProbe
 {
     private const int KnownVendorId = 0x35D8;
 
+    // 未知机型没有设备描述时，按 Rays 协议参数尝试读取。
+    private const byte DefaultReadOp = 0x80;
+    private const byte DefaultReportId = 0x4B;
+    private const byte DefaultIndexCommand = 0x0F;
+    private const byte DefaultBandCommand = 0x09;
+    private const byte DefaultPreGainCommand = 0x23;
+    private const byte DefaultGlobalGainCommand = 0x03;
+    private const int DefaultBandPayloadSize = 33;
+    private const double DefaultGainScale = 256.0;
+    private const int MaxProbeBands = 16;
+
     public static List<HidCandidate> Enumerate()
     {
         var result = new List<HidCandidate>();
@@ -178,7 +189,8 @@ public static class HidProbe
         foreach (var target in targets)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            if (TryReadTarget(target, reportId, report, cancellationToken))
+            var profile = DeviceRegistry.Match(target.VendorId, target.ProductId);
+            if (TryReadTarget(target, profile, reportId, report, cancellationToken))
             {
                 return report;
             }
@@ -214,6 +226,7 @@ public static class HidProbe
 
     private static bool TryReadTarget(
         HidCandidate candidate,
+        DeviceProfile? profile,
         byte? preferredReportId,
         ProbeReport report,
         CancellationToken cancellationToken)
@@ -245,12 +258,23 @@ public static class HidProbe
                 ? candidate.MaxInputReportLength
                 : 64;
 
+            var readOp = profile?.ReadOpValue ?? DefaultReadOp;
+            var indexCommand = profile?.Commands.EqIndexValue ?? DefaultIndexCommand;
+            var bandCommand = profile?.Commands.EqBandValue ?? DefaultBandCommand;
+            var bandPayloadSize = profile?.BandPayloadSize ?? DefaultBandPayloadSize;
+            var bandCount = profile?.BandCount ?? MaxProbeBands;
+            var gainScale = profile?.GainScale ?? DefaultGainScale;
+
             var reportIds = new List<byte>();
             if (preferredReportId.HasValue)
             {
                 reportIds.Add(preferredReportId.Value);
             }
-            foreach (var fallback in new byte[] { 0x4B, 0x00 })
+            if (profile is not null && !reportIds.Contains(profile.ReportIdValue))
+            {
+                reportIds.Add(profile.ReportIdValue);
+            }
+            foreach (var fallback in new[] { DefaultReportId, (byte)0x00 })
             {
                 if (!reportIds.Contains(fallback))
                 {
@@ -262,7 +286,7 @@ public static class HidProbe
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                var index = ReadIndex(stream, outLength, inLength, reportId);
+                var index = ReadIndex(stream, outLength, inLength, reportId, readOp, indexCommand);
                 if (index is null)
                 {
                     continue;
@@ -277,11 +301,19 @@ public static class HidProbe
                 report.ActiveIndex = index;
 
                 var misses = 0;
-                for (var band = 0; band < 16; band++)
+                for (var band = 0; band < bandCount; band++)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
 
-                    var payload = ReadBand(stream, outLength, inLength, reportId, (byte)band);
+                    var payload = ReadBand(
+                        stream,
+                        outLength,
+                        inLength,
+                        reportId,
+                        readOp,
+                        bandCommand,
+                        bandPayloadSize,
+                        (byte)band);
                     if (payload is null)
                     {
                         if (++misses >= 3)
@@ -301,10 +333,22 @@ public static class HidProbe
                     });
                 }
 
-                var preGain = ReadGain(stream, outLength, inLength, reportId, 0x23);
-                var globalGain = ReadGain(stream, outLength, inLength, reportId, 0x03);
-                report.PreGainDb = preGain is null ? null : preGain.Value / 256.0;
-                report.GlobalGainDb = globalGain is null ? null : globalGain.Value / 256.0;
+                var preGain = ReadGain(
+                    stream,
+                    outLength,
+                    inLength,
+                    reportId,
+                    readOp,
+                    profile?.Commands.PreGainValue ?? DefaultPreGainCommand);
+                var globalGain = ReadGain(
+                    stream,
+                    outLength,
+                    inLength,
+                    reportId,
+                    readOp,
+                    profile?.Commands.GlobalGainValue ?? DefaultGlobalGainCommand);
+                report.PreGainDb = preGain is null ? null : preGain.Value / gainScale;
+                report.GlobalGainDb = globalGain is null ? null : globalGain.Value / gainScale;
                 report.Note = report.Bands.Count > 0
                     ? $"已读取 {report.Bands.Count} 段 PEQ 数据。"
                     : "设备有读取响应，但没有读到完整 PEQ 段。";
@@ -323,9 +367,15 @@ public static class HidProbe
         return false;
     }
 
-    private static int? ReadIndex(HidStream stream, int outLength, int inLength, byte reportId)
+    private static int? ReadIndex(
+        HidStream stream,
+        int outLength,
+        int inLength,
+        byte reportId,
+        byte readOp,
+        byte command)
     {
-        var response = Query(stream, outLength, inLength, reportId, 0x0F, Array.Empty<byte>());
+        var response = Query(stream, outLength, inLength, reportId, readOp, command, Array.Empty<byte>());
         if (response is null)
         {
             return null;
@@ -340,6 +390,9 @@ public static class HidProbe
         int outLength,
         int inLength,
         byte reportId,
+        byte readOp,
+        byte command,
+        int payloadSize,
         byte band)
     {
         var response = Query(
@@ -347,7 +400,8 @@ public static class HidProbe
             outLength,
             inLength,
             reportId,
-            0x09,
+            readOp,
+            command,
             new byte[] { 0x00, band });
         if (response is null)
         {
@@ -355,7 +409,7 @@ public static class HidProbe
         }
 
         var payload = Payload(response, reportId);
-        return payload.Length >= 33 ? payload[..33] : null;
+        return payload.Length >= payloadSize ? payload[..payloadSize] : null;
     }
 
     private static short? ReadGain(
@@ -363,9 +417,10 @@ public static class HidProbe
         int outLength,
         int inLength,
         byte reportId,
+        byte readOp,
         byte command)
     {
-        var response = Query(stream, outLength, inLength, reportId, command, Array.Empty<byte>());
+        var response = Query(stream, outLength, inLength, reportId, readOp, command, Array.Empty<byte>());
         if (response is null)
         {
             return null;
@@ -380,12 +435,13 @@ public static class HidProbe
         int outLength,
         int inLength,
         byte reportId,
+        byte readOp,
         byte command,
         byte[] payload)
     {
         var frame = new byte[outLength];
         frame[0] = reportId;
-        frame[1] = 0x80;
+        frame[1] = readOp;
         frame[2] = command;
         frame[3] = (byte)payload.Length;
         if (payload.Length > 0)

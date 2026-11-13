@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -9,6 +10,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using Microsoft.Win32;
+using MoonDropEQ.Core;
 
 namespace MoonDropEQ.Services;
 
@@ -61,6 +63,109 @@ public sealed class CaptureSnapshot
 
     public string Last { get; set; } = string.Empty;
 }
+
+/// <summary>
+/// 采集判定的期望报文。已知机型按设备描述生成，未知机型回退到结构特征。
+/// </summary>
+public sealed class CaptureRules
+{
+    public bool Known { get; set; }
+
+    public int BandPayloadSize { get; set; }
+
+    public int[]? BuiltIn { get; set; }
+
+    public int[]? Band { get; set; }
+
+    public int[]? Save { get; set; }
+
+    public static CaptureRules FromProfile(DeviceProfile? profile)
+    {
+        if (profile is null)
+        {
+            return new CaptureRules();
+        }
+
+        return new CaptureRules
+        {
+            Known = true,
+            BandPayloadSize = profile.BandPayloadSize,
+            BuiltIn = profile.Capabilities.BuiltInSlots
+                ? new[] { (int)profile.WriteOpValue, (int)profile.Commands.EqIndexValue, 1 }
+                : null,
+            Band = profile.Capabilities.Curve
+                ? new[] { (int)profile.WriteOpValue, (int)profile.Commands.EqBandValue }
+                : null,
+            Save = new[] { (int)profile.WriteOpValue, (int)profile.Commands.SaveValue, 0 }
+        };
+    }
+
+    /// <summary>
+    /// 离线判定采集包内容。未知机型按报文长度推断：单字节命令、PEQ 段、空载荷命令。
+    /// </summary>
+    public static CaptureChecks Evaluate(CaptureLog log, CaptureRules rules)
+    {
+        var outgoing = log.Frames.Where(frame => frame.Dir == "out").ToList();
+        if (rules.Known)
+        {
+            return new CaptureChecks(
+                outgoing.Any(frame => Matches(frame, rules.BuiltIn)),
+                outgoing.Any(frame => Matches(frame, rules.Band)),
+                outgoing.Any(frame => Matches(frame, rules.Save)));
+        }
+
+        return new CaptureChecks(
+            outgoing.Any(frame => ByteCount(frame) == 4),
+            outgoing.Any(frame => ByteCount(frame) >= 8),
+            outgoing.Any(frame => ByteCount(frame) <= 3));
+    }
+
+    private static bool Matches(CaptureFrame frame, int[]? prefix)
+    {
+        if (prefix is null || prefix.Length == 0)
+        {
+            return false;
+        }
+
+        var parts = frame.Data.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        for (var offset = 0; offset <= 1; offset++)
+        {
+            if (parts.Length < offset + prefix.Length)
+            {
+                continue;
+            }
+
+            var matched = true;
+            for (var index = 0; index < prefix.Length; index++)
+            {
+                if (!byte.TryParse(
+                        parts[offset + index],
+                        NumberStyles.HexNumber,
+                        CultureInfo.InvariantCulture,
+                        out var value)
+                    || value != prefix[index])
+                {
+                    matched = false;
+                    break;
+                }
+            }
+
+            if (matched)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static int ByteCount(CaptureFrame frame)
+    {
+        return frame.Data.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length;
+    }
+}
+
+public readonly record struct CaptureChecks(bool BuiltIn, bool Curve, bool Saved);
 
 /// <summary>
 /// 用调试模式启动 Edge/Chrome，通过 CDP 注入钩子，记录官网页面与耳机之间的 HID 报文。
@@ -191,8 +296,10 @@ public sealed class HidCaptureSession : IAsyncDisposable
   const state = window.__mdEq;
   if (!state) return JSON.stringify({ ok: false });
 
+  const rules = __RULES__;
   const parse = value => value.split(' ').filter(Boolean).map(item => parseInt(item, 16));
   const startsWith = (frame, expected) => {
+    if (!expected || !expected.length) return false;
     const bytes = parse(frame.data);
     for (const offset of [0, 1]) {
       if (bytes.length < offset + expected.length) continue;
@@ -209,12 +316,23 @@ public sealed class HidCaptureSession : IAsyncDisposable
   };
 
   const outgoing = state.frames.filter(frame => frame.dir === 'out');
+  const known = rules.known === true;
+  const builtIn = known
+    ? outgoing.some(frame => startsWith(frame, rules.builtIn))
+    : outgoing.some(frame => parse(frame.data).length === 4);
+  const curve = known
+    ? outgoing.some(frame => startsWith(frame, rules.band))
+    : outgoing.some(frame => parse(frame.data).length >= 8);
+  const saved = known
+    ? outgoing.some(frame => startsWith(frame, rules.save))
+    : outgoing.some(frame => parse(frame.data).length <= 3);
+
   return JSON.stringify({
     ok: true,
     frames: state.frames.length,
-    builtIn: outgoing.some(frame => startsWith(frame, [0x01, 0x0F, 0x01])),
-    curve: outgoing.some(frame => startsWith(frame, [0x01, 0x0A])),
-    saved: outgoing.some(frame => startsWith(frame, [0x01, 0x01, 0x00])),
+    builtIn,
+    curve,
+    saved,
     devices: state.devices.map(device => ({
       vendorId: device.vendorId,
       productId: device.productId,
@@ -283,9 +401,14 @@ public sealed class HidCaptureSession : IAsyncDisposable
             cancellationToken);
     }
 
-    public async Task<CaptureSnapshot> SnapshotAsync(CancellationToken cancellationToken)
+    public async Task<CaptureSnapshot> SnapshotAsync(CaptureRules rules, CancellationToken cancellationToken)
     {
-        var value = await EvaluateStringAsync(SnapshotExpression, cancellationToken);
+        var expression = SnapshotExpression.Replace(
+            "__RULES__",
+            JsonSerializer.Serialize(
+                rules,
+                new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
+        var value = await EvaluateStringAsync(expression, cancellationToken);
         if (string.IsNullOrWhiteSpace(value))
         {
             return new CaptureSnapshot();

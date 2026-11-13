@@ -23,17 +23,19 @@
 | `Core/DeviceProfile.cs` | 设备描述模型与匹配规则 |
 | `Core/HidEqDevice.cs` | 按设备描述工作的 HID 帧封装与读写方法 |
 | `Services/PresetApplier.cs` | 应用流程时序（内置切槽 / 曲线写入） |
-| `Services/PresetStore.cs` | 预设 JSON 读写、内置 5 个默认项 |
-| `Models/Preset.cs` | `Kind` = `BuiltIn`（按索引）/ `Curve`（8 段十六进制） |
+| `Services/PresetStore.cs` | 预设 JSON 读写；按设备描述生成默认项 |
+| `Models/Preset.cs` | `Kind` = `BuiltIn`（按索引）/ `Curve`（十六进制载荷，段数由设备描述决定） |
 | `Services/HotkeyService.cs` | 全局热键（`RegisterHotKey`） |
 | `Services/TrayService.cs` | 托盘菜单 |
-| `MainWindow.xaml(.cs)` | 主界面、三个页面切换（列表 / 设置 / 关于） |
+| `MainWindow.xaml(.cs)` | 主界面与页面切换（设置 / 设备适配 / 采集 / 关于） |
 | `Views/` | 设置页、关于页（普通 UserControl） |
 | `Themes/AppDark.xaml`、`AppLight.xaml` | 两套配色，切换主题时整体替换 |
 
 ---
 
-## 2. 已实测确认的协议事实
+## 2. Rays 已实测确认的协议事实
+
+> 本章参数以 MOONDROP Rays 为准。其他机型以 `Core/devices.json` 中的设备描述为准，新机型接入见 [adding-device.md](adding-device.md)。
 
 ### 2.1 设备标识
 
@@ -116,7 +118,7 @@
 | 应用内置预设无反应 | `EQ_ACTIVE` 命令或槽位映射变了 | 抓包对比命令字 |
 | 应用曲线无反应 | 载荷长度/格式变了，或缺提交命令 | 抓包对比 33 字节结构与 `01 0A` |
 | 抓取曲线失败 | 读不到 8 段完整数据 | 检查读命令响应长度 |
-| 某些索引越界 | 槽位数量变化 | 调整 `PresetStore` 默认项与校验 |
+| 某些索引越界 | 槽位数量变化 | 调整 `Core/devices.json` 的 `slots` |
 
 **软件不会因此损坏设备**：只写 EQ 参数区与保存命令，不触碰固件 / OTA。
 
