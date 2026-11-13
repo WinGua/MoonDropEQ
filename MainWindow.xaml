@@ -18,9 +18,9 @@
             <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="CornerRadius" Value="8" />
-            <Setter Property="Padding" Value="12,8" />
+            <Setter Property="Padding" Value="12,6" />
             <Setter Property="Margin" Value="0,0,6,6" />
-            <Setter Property="MinHeight" Value="84" />
+            <Setter Property="MinHeight" Value="76" />
             <Setter Property="Cursor" Value="Hand" />
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
@@ -91,13 +91,8 @@
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
 
-                            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
-                                <TextBlock Text="预设" FontSize="16"
-                                           Foreground="{DynamicResource AppTextPrimaryBrush}" />
-                                <TextBlock Text="点击应用 · 右键更多" Margin="10,2,0,0"
-                                           FontSize="12" VerticalAlignment="Center"
-                                           Foreground="{DynamicResource AppTextTertiaryBrush}" />
-                            </StackPanel>
+                            <TextBlock Grid.Row="0" Text="预设" FontSize="16" Margin="0,0,0,8"
+                                       Foreground="{DynamicResource AppTextPrimaryBrush}" />
 
                             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                                 <ItemsControl x:Name="PresetList">
@@ -147,7 +142,7 @@
                                                                Foreground="{DynamicResource AppTextTertiaryBrush}" />
 
                                                     <Border Grid.Row="2" Padding="8,3" CornerRadius="4"
-                                                            Margin="0,6,0,0" HorizontalAlignment="Left"
+                                                            Margin="0,4,0,0" HorizontalAlignment="Left"
                                                             Background="{DynamicResource AppSurfaceBrush}"
                                                             BorderBrush="{DynamicResource AppBorderBrush}"
                                                             BorderThickness="1">

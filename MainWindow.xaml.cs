@@ -44,8 +44,13 @@ public partial class MainWindow : FluentWindow, IUiScalable
         };
 
         _store.Load();
-        _activeDeviceId = DeviceRegistry.DefaultProfile?.Id ?? "rays";
-        CaptureButton.IsEnabled = DeviceRegistry.DefaultProfile?.Capabilities.Curve ?? true;
+        var defaultProfile = DeviceRegistry.DefaultProfile;
+        _activeDeviceId = defaultProfile?.Id ?? "rays";
+        if (defaultProfile is not null)
+        {
+            _store.EnsureDefaultsForDevice(defaultProfile);
+        }
+        CaptureButton.IsEnabled = defaultProfile?.Capabilities.Curve ?? true;
         PresetList.ItemsSource = _items;
         RefreshItems();
         SettingsPage.OpenPresetFileRequested += (_, _) => OpenPresetFile();

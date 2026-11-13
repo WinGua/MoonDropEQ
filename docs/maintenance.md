@@ -225,8 +225,8 @@ print("index =", send(dev, 0x80, 0x0F)[4])
 3. 打标签并推送：
 
 ```powershell
-git tag -a v0.1.0 -m "MoonDropEQ v0.1.0"
-git push origin v0.1.0
+git tag -a v0.2.0 -m "MoonDropEQ v0.2.0"
+git push origin v0.2.0
 ```
 
 4. workflow 会创建 Release 并上传 `MoonDropEQ-win-x64.zip`
@@ -234,10 +234,10 @@ git push origin v0.1.0
 **重发同一版本**（覆盖已有 Release 附件）：
 
 ```powershell
-git tag -d v0.1.0
-git push origin :refs/tags/v0.1.0
-git tag -a v0.1.0 -m "MoonDropEQ v0.1.0"
-git push origin v0.1.0
+git tag -d v0.2.0
+git push origin :refs/tags/v0.2.0
+git tag -a v0.2.0 -m "MoonDropEQ v0.2.0"
+git push origin v0.2.0
 ```
 
 ---

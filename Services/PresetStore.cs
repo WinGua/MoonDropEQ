@@ -73,15 +73,11 @@ public sealed class PresetStore
             }
             catch
             {
-                // 文件损坏时回落到默认列表
+                // 文件损坏时保持空列表，稍后按设备描述生成默认项
             }
         }
 
-        foreach (var preset in CreateDefaults())
-        {
-            Presets.Add(preset);
-        }
-        Save();
+        // 没有任何预设时保持空列表，由 MainWindow 按当前设备描述生成默认项。
     }
 
     public void Save()
@@ -93,11 +89,6 @@ public sealed class PresetStore
 
     public void EnsureDefaultsForDevice(DeviceProfile profile)
     {
-        if (string.Equals(profile.Id, "rays", StringComparison.OrdinalIgnoreCase))
-        {
-            return;
-        }
-
         if (!profile.Capabilities.BuiltInSlots || profile.Slots.Count == 0)
         {
             return;
@@ -135,14 +126,5 @@ public sealed class PresetStore
             }
         }
         return string.Empty;
-    }
-
-    private static IEnumerable<Preset> CreateDefaults()
-    {
-        yield return new Preset { Id = "builtin-default", Name = "默认", Kind = PresetKind.BuiltIn, DeviceId = "rays", Index = 0, Hotkey = "Ctrl+Alt+1" };
-        yield return new Preset { Id = "builtin-music-game", Name = "音乐游戏", Kind = PresetKind.BuiltIn, DeviceId = "rays", Index = 1, Hotkey = "Ctrl+Alt+2" };
-        yield return new Preset { Id = "builtin-triple-a", Name = "3A 游戏", Kind = PresetKind.BuiltIn, DeviceId = "rays", Index = 2, Hotkey = "Ctrl+Alt+3" };
-        yield return new Preset { Id = "builtin-fps1", Name = "FPS1", Kind = PresetKind.BuiltIn, DeviceId = "rays", Index = 3, Hotkey = "Ctrl+Alt+4" };
-        yield return new Preset { Id = "builtin-fps2", Name = "FPS2", Kind = PresetKind.BuiltIn, DeviceId = "rays", Index = 4, Hotkey = "Ctrl+Alt+5" };
     }
 }
