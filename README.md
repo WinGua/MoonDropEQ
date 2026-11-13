@@ -111,7 +111,7 @@
 
 - push `main` → 构建并上传产物；push `v*` 标签 → 创建 Release
 - 构建前自动执行 `tools/validate-devices.ps1` 校验 `Core/devices.json`
-- Actions 产物外层是 GitHub 自动打包的 zip，内含 exe 与许可证；Release 资产是单独的应用 zip
+- 构建产物只包含 `MoonDropEQ.exe`：Actions artifact 是 GitHub 自动打包的 zip，Release 资产是单个应用 zip
 - 工作流：`.github/workflows/build.yml`
 
 协议抓包、固件升级适配与发版流程见 [docs/maintenance.md](docs/maintenance.md)；新机型接入见 [docs/adding-device.md](docs/adding-device.md)。

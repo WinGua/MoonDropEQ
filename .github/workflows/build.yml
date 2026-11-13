@@ -62,13 +62,13 @@ jobs:
           exit 1
 
       - name: Package
-        run: Compress-Archive -Path publish/* -DestinationPath MoonDropEQ-win-x64.zip -Force
+        run: Compress-Archive -Path publish/MoonDropEQ.exe -DestinationPath MoonDropEQ-win-x64.zip -Force
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: MoonDropEQ-win-x64
-          path: publish/*
+          path: publish/MoonDropEQ.exe
 
       - name: Release
         if: startsWith(github.ref, 'refs/tags/')
