@@ -534,7 +534,7 @@ public partial class MainWindow : FluentWindow, IUiScalable
         {
             ActiveText.Text = string.Empty;
             SideCurrentName.Text = "未选择";
-            SideCurrentMeta.Text = "点击左侧卡片应用";
+            SideCurrentMeta.Text = "点击右侧卡片应用";
         }
         else
         {
@@ -590,7 +590,7 @@ public partial class MainWindow : FluentWindow, IUiScalable
     {
         var wide = ActualWidth >= 840;
         SidePanel.Visibility = wide ? Visibility.Visible : Visibility.Collapsed;
-        SideColumn.Width = wide ? new GridLength(280) : new GridLength(0);
+        SideColumn.Width = wide ? new GridLength(260) : new GridLength(0);
     }
 
     private void SideRename_Click(object sender, RoutedEventArgs e)
