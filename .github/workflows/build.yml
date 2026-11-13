@@ -17,6 +17,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Validate device profiles
+        shell: pwsh
+        run: ./tools/validate-devices.ps1
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:

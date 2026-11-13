@@ -210,6 +210,7 @@ print("index =", send(dev, 0x80, 0x0F)[4])
 | 载荷长度变化 | `Core/devices.json` 的 `bandPayloadSize`、`bandCount` |
 | 槽位映射变化 | `Core/devices.json` 的 `slots`、`curveSlot` |
 | 增加新机型 | 在 `Core/devices.json` 里新增一条设备描述 |
+| 校验设备描述 | `pwsh tools/validate-devices.ps1`（CI 构建前会自动执行） |
 
 设备描述由 `Core/DeviceRegistry.cs` 在启动时加载，`HidEqDevice` 按描述收发报文。只有遇到设备描述无法表达的特殊流程（例如额外握手或双通道分别写入）才需要改代码。
 

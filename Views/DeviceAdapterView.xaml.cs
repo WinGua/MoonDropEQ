@@ -32,9 +32,16 @@ public partial class DeviceAdapterView : UserControl
         {
             var candidates = await Task.Run(HidProbe.Enumerate);
             var best = candidates.FirstOrDefault(candidate => candidate.Score >= 50);
-            DeviceText.Text = best is null
-                ? "未检测到耳机"
-                : $"{best.DisplayName}（VID 0x{best.VendorId:X4} / PID 0x{best.ProductId:X4}）";
+            if (best is null)
+            {
+                DeviceText.Text = "未检测到耳机";
+                return;
+            }
+
+            var profile = DeviceRegistry.Match(best.VendorId, best.ProductId);
+            var status = profile is null ? "未适配" : "已适配";
+            var name = profile?.Name ?? best.DisplayName;
+            DeviceText.Text = $"{name}（{status}，VID 0x{best.VendorId:X4} / PID 0x{best.ProductId:X4}）";
         }
         catch
         {

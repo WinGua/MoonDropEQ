@@ -134,6 +134,7 @@
 
 - push 到 `main` → 自动构建并上传产物 `MoonDropEQ-win-x64`
 - 推送 `v*` 标签 → 自动创建 Release 并附带 zip
+- 构建前会执行 `tools/validate-devices.ps1` 校验 `Core/devices.json`
 - 工作流：`.github/workflows/build.yml`（`windows-latest` + `dotnet publish -r win-x64 --self-contained`）
 
 ## 维护

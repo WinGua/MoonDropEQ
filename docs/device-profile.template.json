@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "id": "example-device",
+  "name": "MOONDROP Example",
+  "vendorId": "0x0000",
+  "productIds": ["0x0000"],
+  "reportId": "0x4B",
+  "readOp": "0x80",
+  "writeOp": "0x01",
+  "bandCount": 8,
+  "bandPayloadSize": 33,
+  "curveSlot": 7,
+  "gainScale": 256,
+  "slots": [
+    { "index": 0, "name": "默认" },
+    { "index": 1, "name": "游戏" }
+  ],
+  "commands": {
+    "eqIndex": "0x0F",
+    "eqBand": "0x09",
+    "commit": "0x0A",
+    "preGain": "0x23",
+    "globalGain": "0x03",
+    "save": "0x01"
+  },
+  "capabilities": {
+    "builtInSlots": true,
+    "curve": true,
+    "preGain": true,
+    "globalGain": true,
+    "needsCommit": true,
+    "dualChannel": false
+  },
+  "timing": {
+    "switchDelayMs": 150,
+    "bandDelayMs": 30,
+    "saveDelayMs": 300
+  },
+  "verified": {
+    "level": "experimental",
+    "notes": "待实机验证"
+  },
+  "source": "",
+  "notes": "复制到 Core/devices.json 数组末尾后修改，不要直接使用示例值。"
+}

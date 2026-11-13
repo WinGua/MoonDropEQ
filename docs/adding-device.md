@@ -66,15 +66,16 @@
 
 1. Fork 仓库并拉取最新 `main`
 2. 按第 1 节完成采集，解压 zip
-3. 打开 `Core/devices.json`，在数组末尾新增一条设备描述；文件会随程序一起打包
+3. 复制 [device-profile.template.json](device-profile.template.json) 的一条记录到 `Core/devices.json` 数组末尾，再按采集结果修改；模板里的示例值不能直接使用
 
 ### 3.2 让 AI 帮你生成设备描述
 
-把下面这段提示词、`docs/adding-device.md`、`docs/device-profile.schema.json` 和采集包一起交给 AI：
+把下面这段提示词、`docs/adding-device.md`、`docs/device-profile.schema.json`、`docs/device-profile.template.json` 和采集包一起交给 AI：
 
 ```text
-你是 MoonDropEQ 的设备适配助手。请阅读 docs/adding-device.md 和 docs/device-profile.schema.json，
-根据我提供的 capture.json、probe.json，在 Core/devices.json 中新增一条 profile。
+你是 MoonDropEQ 的设备适配助手。请阅读 docs/adding-device.md、docs/device-profile.schema.json
+和 docs/device-profile.template.json，根据我提供的 capture.json、probe.json，在 Core/devices.json
+中新增一条 profile。
 
 要求：
 - 只修改 Core/devices.json，不改任何 C# 代码
@@ -90,6 +91,14 @@
 - `vendorId` / `productIds` / `reportId` 与 `capture.json` 里官网识别到的一致
 - `bandCount` / `bandPayloadSize` 与 `probe.json` 里的段数和长度一致
 - `capabilities` 只勾选抓包里真实出现过的能力
+
+装了 PowerShell 7 的话，可以直接跑仓库里的校验脚本：
+
+```powershell
+pwsh tools/validate-devices.ps1
+```
+
+CI 在构建前也会执行同一个脚本，字段写错会直接让构建失败，并在日志里指出是哪一条 profile 的哪个字段。
 
 ### 3.4 构建与实机验证
 
