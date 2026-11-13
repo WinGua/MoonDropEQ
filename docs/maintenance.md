@@ -19,7 +19,9 @@
 
 | 文件 | 职责 |
 | --- | --- |
-| `Core/RaysDevice.cs` | **协议全部在这里**：VID/PID、帧封装、命令字、读写方法 |
+| `Core/devices.json` | **设备描述**：VID/PID、Report ID、命令字、段数、槽位、时序 |
+| `Core/DeviceProfile.cs` | 设备描述模型与匹配规则 |
+| `Core/HidEqDevice.cs` | 按设备描述工作的 HID 帧封装与读写方法 |
 | `Services/PresetApplier.cs` | 应用流程时序（内置切槽 / 曲线写入） |
 | `Services/PresetStore.cs` | 预设 JSON 读写、内置 5 个默认项 |
 | `Models/Preset.cs` | `Kind` = `BuiltIn`（按索引）/ `Curve`（8 段十六进制） |
@@ -203,13 +205,13 @@ print("index =", send(dev, 0x80, 0x0F)[4])
 
 | 变化 | 改哪里 |
 | --- | --- |
-| VID / PID / ReportId | `RaysDevice` 顶部常量 |
-| 新增/改名命令字 | `RaysDevice` 的 `Cmd*` 常量 + `PresetApplier` 时序 |
-| 载荷长度变化 | `RaysDevice.BandPayloadSize`、`BandCount` |
-| 槽位映射变化 | `RaysDevice.PeqSlot`、`PresetStore.CreateDefaults()` |
-| 增加新机型 | 先按 [adding-device.md](adding-device.md) 采集真实报文，再把参数抽成设备描述 |
+| VID / PID / ReportId | `Core/devices.json` |
+| 新增/改名命令字 | `Core/devices.json` 的 `commands` + `PresetApplier` 时序 |
+| 载荷长度变化 | `Core/devices.json` 的 `bandPayloadSize`、`bandCount` |
+| 槽位映射变化 | `Core/devices.json` 的 `slots`、`curveSlot` |
+| 增加新机型 | 在 `Core/devices.json` 里新增一条设备描述 |
 
-**演进方向**：把 `VID/PID/reportId/命令字/载荷长度/槽位表` 抽成 `devices.json` + `DeviceProfile` 类，`RaysDevice` 改为按 profile 工作。当前是单机型硬编码，改动量小但多机型会重复。
+设备描述由 `Core/DeviceRegistry.cs` 在启动时加载，`HidEqDevice` 按描述收发报文。只有遇到设备描述无法表达的特殊流程（例如额外握手或双通道分别写入）才需要改代码。
 
 新机型的采集、提交和验证流程见 [adding-device.md](adding-device.md)。
 

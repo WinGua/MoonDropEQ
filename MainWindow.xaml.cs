@@ -20,7 +20,8 @@ public partial class MainWindow : FluentWindow
 
     private HotkeyService? _hotkeys;
     private TrayService? _tray;
-    private RaysDevice? _device;
+    private HidEqDevice? _device;
+    private string _activeDeviceId = "rays";
     private Preset? _lastCurve;
     private Preset? _activePreset;
     private bool _busy;
@@ -39,6 +40,8 @@ public partial class MainWindow : FluentWindow
         };
 
         _store.Load();
+        _activeDeviceId = DeviceRegistry.DefaultProfile?.Id ?? "rays";
+        CaptureButton.IsEnabled = DeviceRegistry.DefaultProfile?.Capabilities.Curve ?? true;
         PresetList.ItemsSource = _items;
         RefreshItems();
         SettingsPage.OpenPresetFileRequested += (_, _) => OpenPresetFile();
@@ -57,7 +60,7 @@ public partial class MainWindow : FluentWindow
         _tray.ExitRequested += ExitApplication;
         _tray.AboutRequested += () => ShowPage(AboutHost);
         _tray.PresetRequested += preset => _ = ApplyPresetAsync(preset);
-        _tray.Update(_store.Presets);
+        _tray.Update(ActivePresets);
 
         RegisterHotkeys();
     }
@@ -72,7 +75,7 @@ public partial class MainWindow : FluentWindow
         _hotkeys.UnregisterAll();
         var failures = new List<string>();
 
-        foreach (var preset in _store.Presets)
+        foreach (var preset in ActivePresets)
         {
             if (string.IsNullOrWhiteSpace(preset.Hotkey))
             {
@@ -96,7 +99,7 @@ public partial class MainWindow : FluentWindow
     {
         UpdateConnection(null, "正在查找耳机…");
 
-        var found = await Task.Run(RaysDevice.TryOpen);
+        var found = await Task.Run(DeviceRegistry.TryOpen);
         if (found is null)
         {
             UpdateConnection(false, "未连接（插上耳机后重试一次应用）");
@@ -104,19 +107,27 @@ public partial class MainWindow : FluentWindow
         }
 
         _device = found;
-        UpdateConnection(true, "已连接 · MOONDROP Rays");
+        ApplyProfile(found.Profile);
+        UpdateConnection(true, $"已连接 · {found.Profile.Name}");
         await RefreshActiveAsync();
     }
 
-    private RaysDevice? EnsureDevice()
+    private HidEqDevice? EnsureDevice()
     {
         if (_device is not null)
         {
             return _device;
         }
 
-        _device = RaysDevice.TryOpen();
-        UpdateConnection(_device is not null, _device is null ? "未连接" : "已连接 · MOONDROP Rays");
+        _device = DeviceRegistry.TryOpen();
+        if (_device is not null)
+        {
+            ApplyProfile(_device.Profile);
+        }
+
+        UpdateConnection(
+            _device is not null,
+            _device is null ? "未连接" : $"已连接 · {_device.Profile.Name}");
         return _device;
     }
 
@@ -135,13 +146,16 @@ public partial class MainWindow : FluentWindow
         }
 
         Preset? active = null;
-        if (index == RaysDevice.PeqSlot)
+        if (index == device.Profile.CurveSlot)
         {
             active = _lastCurve;
         }
         else
         {
-            active = _store.Presets.FirstOrDefault(p => p.Kind == PresetKind.BuiltIn && p.Index == index);
+            active = _store.Presets.FirstOrDefault(p =>
+                p.Kind == PresetKind.BuiltIn
+                && p.Index == index
+                && string.Equals(p.DeviceId, device.Profile.Id, StringComparison.OrdinalIgnoreCase));
         }
 
         SetActive(active);
@@ -161,6 +175,12 @@ public partial class MainWindow : FluentWindow
             if (device is null)
             {
                 ShowToast("未检测到耳机，请确认已插好", true);
+                return;
+            }
+
+            if (!string.Equals(preset.DeviceId, device.Profile.Id, StringComparison.OrdinalIgnoreCase))
+            {
+                ShowToast("该预设属于其他设备，当前耳机无法应用", true);
                 return;
             }
 
@@ -209,7 +229,9 @@ public partial class MainWindow : FluentWindow
             var preGain = await Task.Run(device.ReadPreGainDb);
             var globalGain = await Task.Run(device.ReadGlobalGainDb);
 
-            var suggested = $"曲线 {_store.Presets.Count(p => p.Kind == PresetKind.Curve) + 1}";
+            var suggested = $"曲线 {_store.Presets.Count(p =>
+                p.Kind == PresetKind.Curve
+                && string.Equals(p.DeviceId, device.Profile.Id, StringComparison.OrdinalIgnoreCase)) + 1}";
             var name = RenameDialog.Show(this, "抓取曲线", "给这条曲线起个名字，方便之后用热键切换：", suggested);
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -220,6 +242,7 @@ public partial class MainWindow : FluentWindow
             {
                 Name = name.Trim(),
                 Kind = PresetKind.Curve,
+                DeviceId = device.Profile.Id,
                 Bands = bands.ToList(),
                 PreGainDb = preGain,
                 GlobalGainDb = globalGain,
@@ -232,7 +255,7 @@ public partial class MainWindow : FluentWindow
             _lastCurve = preset;
             RefreshItems();
             RegisterHotkeys();
-            _tray?.Update(_store.Presets);
+            _tray?.Update(ActivePresets);
             SetActive(preset);
             ShowToast($"已保存：{preset.Name}");
         }
@@ -418,7 +441,7 @@ public partial class MainWindow : FluentWindow
         _store.Save();
         RefreshItems();
         SetActive(_activePreset);
-        _tray?.Update(_store.Presets);
+        _tray?.Update(ActivePresets);
         ShowToast($"已改名为：{trimmed}");
     }
 
@@ -447,7 +470,7 @@ public partial class MainWindow : FluentWindow
         RefreshItems();
         SetActive(_activePreset);
         RegisterHotkeys();
-        _tray?.Update(_store.Presets);
+        _tray?.Update(ActivePresets);
         ShowToast(string.IsNullOrWhiteSpace(gesture) ? "已清除热键" : $"热键已设为 {gesture}");
     }
 
@@ -473,14 +496,37 @@ public partial class MainWindow : FluentWindow
 
         RefreshItems();
         RegisterHotkeys();
-        _tray?.Update(_store.Presets);
+        _tray?.Update(ActivePresets);
         ShowToast($"已删除：{preset.Name}");
+    }
+
+    private IEnumerable<Preset> ActivePresets => _store.Presets.Where(preset =>
+        string.Equals(preset.DeviceId, _activeDeviceId, StringComparison.OrdinalIgnoreCase));
+
+    private void ApplyProfile(DeviceProfile profile)
+    {
+        var changed = !string.Equals(_activeDeviceId, profile.Id, StringComparison.OrdinalIgnoreCase);
+        _activeDeviceId = profile.Id;
+        if (changed)
+        {
+            _lastCurve = null;
+        }
+
+        _store.EnsureDefaultsForDevice(profile);
+        CaptureButton.IsEnabled = profile.Capabilities.Curve;
+        RefreshItems();
+        if (changed)
+        {
+            SetActive(null);
+        }
+        RegisterHotkeys();
+        _tray?.Update(ActivePresets);
     }
 
     private void RefreshItems()
     {
         _items.Clear();
-        foreach (var preset in _store.Presets)
+        foreach (var preset in ActivePresets)
         {
             _items.Add(new PresetItem(preset));
         }

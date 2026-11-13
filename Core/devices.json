@@ -1,0 +1,49 @@
+[
+  {
+    "schema": 1,
+    "id": "rays",
+    "name": "MOONDROP Rays",
+    "vendorId": "0x35D8",
+    "productIds": ["0x011B"],
+    "reportId": "0x4B",
+    "readOp": "0x80",
+    "writeOp": "0x01",
+    "bandCount": 8,
+    "bandPayloadSize": 33,
+    "curveSlot": 7,
+    "gainScale": 256,
+    "slots": [
+      { "index": 0, "name": "默认" },
+      { "index": 1, "name": "音乐游戏" },
+      { "index": 2, "name": "3A 游戏" },
+      { "index": 3, "name": "FPS1" },
+      { "index": 4, "name": "FPS2" }
+    ],
+    "commands": {
+      "eqIndex": "0x0F",
+      "eqBand": "0x09",
+      "commit": "0x0A",
+      "preGain": "0x23",
+      "globalGain": "0x03",
+      "save": "0x01"
+    },
+    "capabilities": {
+      "builtInSlots": true,
+      "curve": true,
+      "preGain": true,
+      "globalGain": true,
+      "needsCommit": true,
+      "dualChannel": false
+    },
+    "timing": {
+      "switchDelayMs": 150,
+      "bandDelayMs": 30,
+      "saveDelayMs": 300
+    },
+    "verified": {
+      "level": "official",
+      "notes": "Rays 实机验证"
+    },
+    "source": "https://github.com/WinGua/MoonDropEQ"
+  }
+]

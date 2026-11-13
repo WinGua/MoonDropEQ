@@ -1,14 +1,16 @@
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Collections.ObjectModel;
+using MoonDropEQ.Core;
 using MoonDropEQ.Models;
 
 namespace MoonDropEQ.Services;
 
 public sealed class PresetFile
 {
-    public int Version { get; set; } = 1;
+    public int Version { get; set; } = 2;
 
     public List<Preset> Presets { get; set; } = new();
 }
@@ -37,6 +39,7 @@ public sealed class PresetStore
     public void Load()
     {
         Presets.Clear();
+        var needsSave = false;
 
         if (File.Exists(FilePath))
         {
@@ -46,9 +49,24 @@ public sealed class PresetStore
                 var data = JsonSerializer.Deserialize<PresetFile>(json, Options);
                 if (data?.Presets is { Count: > 0 })
                 {
+                    if (data.Version < 2)
+                    {
+                        needsSave = true;
+                    }
+
                     foreach (var preset in data.Presets)
                     {
+                        if (string.IsNullOrWhiteSpace(preset.DeviceId))
+                        {
+                            preset.DeviceId = "rays";
+                            needsSave = true;
+                        }
                         Presets.Add(preset);
+                    }
+
+                    if (needsSave)
+                    {
+                        Save();
                     }
                     return;
                 }
@@ -68,9 +86,42 @@ public sealed class PresetStore
 
     public void Save()
     {
-        var data = new PresetFile { Version = 1, Presets = Presets.ToList() };
+        var data = new PresetFile { Version = 2, Presets = Presets.ToList() };
         var json = JsonSerializer.Serialize(data, Options);
         File.WriteAllText(FilePath, json);
+    }
+
+    public void EnsureDefaultsForDevice(DeviceProfile profile)
+    {
+        if (string.Equals(profile.Id, "rays", StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        if (!profile.Capabilities.BuiltInSlots || profile.Slots.Count == 0)
+        {
+            return;
+        }
+
+        if (Presets.Any(preset =>
+                string.Equals(preset.DeviceId, profile.Id, StringComparison.OrdinalIgnoreCase)))
+        {
+            return;
+        }
+
+        foreach (var slot in profile.Slots.OrderBy(slot => slot.Index))
+        {
+            Presets.Add(new Preset
+            {
+                Id = $"{profile.Id}-builtin-{slot.Index}",
+                Name = slot.Name,
+                Kind = PresetKind.BuiltIn,
+                DeviceId = profile.Id,
+                Index = slot.Index,
+                Hotkey = NextHotkey()
+            });
+        }
+        Save();
     }
 
     public string NextHotkey()
@@ -88,10 +139,10 @@ public sealed class PresetStore
 
     private static IEnumerable<Preset> CreateDefaults()
     {
-        yield return new Preset { Id = "builtin-default", Name = "默认", Kind = PresetKind.BuiltIn, Index = 0, Hotkey = "Ctrl+Alt+1" };
-        yield return new Preset { Id = "builtin-music-game", Name = "音乐游戏", Kind = PresetKind.BuiltIn, Index = 1, Hotkey = "Ctrl+Alt+2" };
-        yield return new Preset { Id = "builtin-triple-a", Name = "3A 游戏", Kind = PresetKind.BuiltIn, Index = 2, Hotkey = "Ctrl+Alt+3" };
-        yield return new Preset { Id = "builtin-fps1", Name = "FPS1", Kind = PresetKind.BuiltIn, Index = 3, Hotkey = "Ctrl+Alt+4" };
-        yield return new Preset { Id = "builtin-fps2", Name = "FPS2", Kind = PresetKind.BuiltIn, Index = 4, Hotkey = "Ctrl+Alt+5" };
+        yield return new Preset { Id = "builtin-default", Name = "默认", Kind = PresetKind.BuiltIn, DeviceId = "rays", Index = 0, Hotkey = "Ctrl+Alt+1" };
+        yield return new Preset { Id = "builtin-music-game", Name = "音乐游戏", Kind = PresetKind.BuiltIn, DeviceId = "rays", Index = 1, Hotkey = "Ctrl+Alt+2" };
+        yield return new Preset { Id = "builtin-triple-a", Name = "3A 游戏", Kind = PresetKind.BuiltIn, DeviceId = "rays", Index = 2, Hotkey = "Ctrl+Alt+3" };
+        yield return new Preset { Id = "builtin-fps1", Name = "FPS1", Kind = PresetKind.BuiltIn, DeviceId = "rays", Index = 3, Hotkey = "Ctrl+Alt+4" };
+        yield return new Preset { Id = "builtin-fps2", Name = "FPS2", Kind = PresetKind.BuiltIn, DeviceId = "rays", Index = 4, Hotkey = "Ctrl+Alt+5" };
     }
 }

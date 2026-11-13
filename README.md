@@ -23,6 +23,7 @@
 | MOONDROP Rays（光束） | `0x35D8` | `0x011B` | `0x4B` | 官方实机 |
 
 > 其他水月雨第二代 DSP 设备（FreeDSP Pro、DAWN PRO2 等）协议相近，但参数和时序未经验证，不要直接套用。
+> 设备参数位于 `Core/devices.json`；新增型号按下面的流程采集后提交。
 
 ### 适配新设备
 
@@ -91,12 +92,13 @@
 
 ```jsonc
 {
-  "version": 1,
+  "version": 2,
   "presets": [
     {
       "id": "builtin-fps1",
       "name": "FPS1",
       "kind": "BuiltIn",      // BuiltIn：按索引切槽；Curve：写入 PEQ 工作区
+      "deviceId": "rays",     // 对应 Core/devices.json 里的设备 id
       "index": 3,             // 仅 BuiltIn 使用
       "hotkey": "Ctrl+Alt+4"  // 支持 Ctrl / Alt / Shift / Win + 字母、数字、F1–F24
     },
@@ -104,6 +106,7 @@
       "id": "curve-xxx",
       "name": "CS2",
       "kind": "Curve",
+      "deviceId": "rays",
       "preGainDb": -7.5,
       "globalGainDb": 0,
       "bands": ["00 00 ...", "..."],  // 8 段，每段 33 字节十六进制

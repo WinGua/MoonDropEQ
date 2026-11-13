@@ -17,6 +17,9 @@ public sealed class Preset
 
     public PresetKind Kind { get; set; } = PresetKind.BuiltIn;
 
+    /// <summary>预设所属的设备描述 Id。</summary>
+    public string DeviceId { get; set; } = string.Empty;
+
     /// <summary>内置预设对应的设备索引。</summary>
     public int Index { get; set; }
 
@@ -36,6 +39,7 @@ public sealed class Preset
             Id = Id,
             Name = Name,
             Kind = Kind,
+            DeviceId = DeviceId,
             Index = Index,
             PreGainDb = PreGainDb,
             GlobalGainDb = GlobalGainDb,
