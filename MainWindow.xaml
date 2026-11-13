@@ -143,7 +143,7 @@
 
                                                     <Border Grid.Row="2" Padding="8,3" CornerRadius="4"
                                                             Margin="0,4,0,0" HorizontalAlignment="Left"
-                                                            Background="{DynamicResource AppSurfaceBrush}"
+                                                            Background="{DynamicResource AppChipBrush}"
                                                             BorderBrush="{DynamicResource AppBorderBrush}"
                                                             BorderThickness="1">
                                                         <TextBlock Text="{Binding HotkeyText}" FontFamily="Consolas" FontSize="11"
