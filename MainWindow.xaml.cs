@@ -33,6 +33,7 @@ public partial class MainWindow : FluentWindow, IUiScalable
         InitializeComponent();
         ThemeService.ApplyBackdrop(this);
         ApplyUiScale(ThemeService.UiScale);
+        RestoreWindowSize();
         SizeChanged += (_, _) => UpdateResponsiveLayout();
         UpdateResponsiveLayout();
 
@@ -613,6 +614,38 @@ public partial class MainWindow : FluentWindow, IUiScalable
         Height = Math.Min(520 * scale + 16, maxHeight);
     }
 
+    private void RestoreWindowSize()
+    {
+        var settings = ThemeService.Current;
+        if (settings.WindowWidth <= 0 || settings.WindowHeight <= 0)
+        {
+            return;
+        }
+
+        var workArea = SystemParameters.WorkArea;
+        Width = Math.Clamp(settings.WindowWidth, MinWidth, Math.Max(MinWidth, workArea.Width - 40));
+        Height = Math.Clamp(settings.WindowHeight, MinHeight, Math.Max(MinHeight, workArea.Height - 40));
+
+        if (settings.WindowMaximized)
+        {
+            WindowState = WindowState.Maximized;
+        }
+    }
+
+    private void SaveWindowSize()
+    {
+        if (WindowState == WindowState.Minimized)
+        {
+            return;
+        }
+
+        var settings = ThemeService.Current;
+        settings.WindowMaximized = WindowState == WindowState.Maximized;
+        settings.WindowWidth = Width;
+        settings.WindowHeight = Height;
+        SettingsStore.Save(settings);
+    }
+
     private void UpdateResponsiveLayout()
     {
         var logicalWidth = ActualWidth / ThemeService.UiScale;
@@ -676,6 +709,7 @@ public partial class MainWindow : FluentWindow, IUiScalable
     private void ExitApplication()
     {
         _exiting = true;
+        SaveWindowSize();
         DisposeInfrastructure();
         Application.Current.Shutdown();
     }
@@ -693,6 +727,8 @@ public partial class MainWindow : FluentWindow, IUiScalable
 
     private void OnWindowClosing(object? sender, CancelEventArgs e)
     {
+        SaveWindowSize();
+
         if (_exiting)
         {
             return;
