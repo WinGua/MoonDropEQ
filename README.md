@@ -1,19 +1,17 @@
 # MoonDropEQ
 
-适用于 **水月雨 MOONDROP耳机** 的 Windows 桌面 EQ 预设遥控器。
+水月雨 MOONDROP 耳机的 Windows 桌面 EQ 遥控器。把官网调音工具的「选设备 → 挑预设 → 应用」压缩成**一次点击**或**一个热键**。
 
-把官网 [水月雨在线调音工具](https://hub.moondroplab.tech/) 的「打开网页 → 选设备 → 开始使用 → 挑预设 → 点应用」五步，压缩成**一次点击**或**一个热键**。
+[下载最新版](https://github.com/WinGua/MoonDropEQ/releases/latest) · [适配新设备](docs/adding-device.md) · [问题反馈](https://github.com/WinGua/MoonDropEQ/issues)
 
 ## 功能
 
-- **内置预设一键切换**：默认 / 音乐游戏 / 3A 游戏 / FPS1 / FPS2
-- **抓取曲线**：在官网调好音后，一键把当前曲线存到本地
-- **全局热键**：任意预设可绑定组合键，窗口最小化也能切换
-- **托盘常驻**：关窗口即收进托盘，单击图标唤回
-- **设备适配采集**：一键采集新机型的 HID 报文与只读探测结果，方便提交适配
-- **单文件 exe**：免安装，体积约 65 MB（自包含运行时）
-- **外观可调**：Mica / 亚克力 / 纯色三种材质，深色 / 浅色 / 跟随系统三种主题，即时生效
-- **自适应布局**：宽屏双栏、窄屏单栏，预设卡片自动换行；支持 90% / 100% / 110% / 125% 界面缩放
+- **一键切换内置预设**：默认 / 音乐游戏 / 3A 游戏 / FPS1 / FPS2
+- **抓取与回放曲线**：在官网调好音后保存到本地，之后一键切换
+- **全局热键与托盘**：窗口最小化也能切换，关窗口默认收进托盘
+- **设备适配采集**：一键采集新机型的 HID 报文与只读探测结果
+- **自适应界面**：宽屏双栏、窄屏单栏，支持 90% / 100% / 110% / 125% 缩放
+- **单文件 exe**：免安装，自包含运行时，约 65 MB
 
 <a id="supported-devices"></a>
 
@@ -23,143 +21,113 @@
 | --- | --- | --- | --- | --- |
 | MOONDROP Rays（光束） | `0x35D8` | `0x011B` | `0x4B` | 官方实机 |
 
-> 其他水月雨第二代 DSP 设备（FreeDSP Pro、DAWN PRO2 等）协议相近，但参数和时序未经验证，不要直接套用。
-> 设备参数位于 `Core/devices.json`；新增型号按下面的流程采集后提交。
+设备参数统一放在 `Core/devices.json`。其他水月雨第二代 DSP 设备协议相近，但参数和时序未经验证，不要直接套用。
 
 ### 适配新设备
 
-如果你的型号还不在上表：
-
-1. 打开 MoonDropEQ，底栏点「设备适配」→「设备采集」
+1. 底栏「设备适配」→「设备采集」
 2. 按提示在官网应用一次「默认」和一条「自定义曲线」
-3. 回到「采集提交」，选择提交 Issue 或按 PR 指南提交
+3. 点「采集提交」，选择提交 Issue 或按 PR 指南提交
 
-采集过程只读取耳机信息，不会写入。详细步骤和证据要求见 [docs/adding-device.md](docs/adding-device.md)。
+采集只读取耳机信息，不会写入。完整步骤和验证要求见 [docs/adding-device.md](docs/adding-device.md)。
+
+## 使用
+
+1. 插上耳机，双击 `MoonDropEQ.exe`
+2. 点击预设卡片，或按对应热键
+
+### 添加自定义曲线
+
+1. 在官网连接耳机，应用想用的预设
+2. 回到本工具点「抓取曲线」
+3. 命名保存，之后即可点击或热键切换
+
+## 设置与预设管理
+
+底部「设置」可调整：
+
+- **关闭窗口时**：最小化到托盘或直接退出
+- **窗口材质**：Mica / 亚克力 / 纯色
+- **主题**：跟随系统 / 深色 / 浅色
+- **界面缩放**：90% / 100% / 110% / 125%
+
+设置即时生效，保存在 `%APPDATA%\MoonDropEQ\settings.json`。
+
+选中预设后，可在左侧信息卡重命名、设置热键或删除；任意卡片也可右键操作。热键支持 `Ctrl / Alt / Shift / Win` + 字母、数字、`F1–F24`，单功能键仅支持 `F1–F24`。
 
 ## 工作原理
 
-官网调音工具使用 **WebHID** 与耳机通信，并非私有驱动。本工具用完全相同的 HID 报文直接对话：
+官网调音工具通过 **WebHID** 与耳机通信。本工具使用相同的 HID 报文直接对话：
 
 ```
-帧格式：[reportId][op][cmd][len][payload...]，输出报告固定 64 字节
+[reportId][op][cmd][len][payload...]   输出报告固定 64 字节
 ```
 
 | 操作 | 报文 |
 | --- | --- |
-| 切换内置预设 | `01 0F 01 <index>` → 写 preGain / globalGain → `01 01 00` 保存 |
-| 应用自定义曲线 | `01 0F 01 07` → 8 × `01 09 21 <33 字节参数>` → `01 0A 04 00 00 FF FF` → 写增益 → `01 01 00` 保存 |
+| 切换内置预设 | `01 0F 01 <index>` → 写增益 → `01 01 00` 保存 |
+| 应用自定义曲线 | `01 0F 01 07` → 8 × `01 09 21 <33 字节>` → `01 0A 04 00 00 FF FF` → 写增益 → 保存 |
 
-每段 PEQ 参数是 **33 字节**，工具只做原样存取、不解码，因此写入结果与官网完全一致。
+每段 PEQ 参数固定 **33 字节**，工具只做原样存取、不解码，因此写入结果与官网一致。
 
-### 设备槽位
-
-- `0` 默认 · `1` 音乐游戏 · `2` 3A 游戏 · `3` FPS1 · `4` FPS2
-- `5` – `7` 为无效索引（会沿用上一个有效预设的数据）
-- 自定义曲线只有**一块共享工作区**，同一时刻只能生效一条，切换耗时约 0.5 秒
-
-## 使用
-
-1. 插上耳机（系统会识别为 `MOONDROP Rays`）
-2. 双击 `MoonDropEQ.exe`
-3. 点击预设卡片，或按对应热键
-
-### 添加自己的曲线
-
-1. 打开官网，连接耳机，挑选并应用你想用的预设（游戏板块 / 收藏夹都可以）
-2. 回到本工具，点「**抓取曲线**」
-3. 起个名字保存 —— 之后它就和内置预设一样，点击或热键即可切换
-
-## 设置
-
-点主窗口底部「设置」：
-
-- **关闭窗口时**：最小化到托盘（默认，热键继续可用）或直接退出程序
-- **窗口材质**：Mica（云母）/ 亚克力（磨砂）/ 纯色（无材质，性能最好）
-- **主题**：跟随系统 / 深色 / 浅色
-
-改动即时生效，并写入 `%APPDATA%\MoonDropEQ\settings.json`。
-
-### 管理预设
-
-每个预设卡片下方都有「重命名 / 设置热键 / 删除」按钮，也可以直接右键卡片：
-
-- **重命名**：随时改名字
-- **设置热键…**：按下想要的组合键即可绑定；支持 `Ctrl / Alt / Shift / Win` + 字母、数字、`F1–F24`，单功能键仅支持 `F1–F24`
-- **删除**：只从本地列表移除，不会改动耳机内的设置
+内置槽位：`0` 默认、`1` 音乐游戏、`2` 3A 游戏、`3` FPS1、`4` FPS2。`5–7` 为无效索引；自定义曲线只有一块共享工作区，同一时刻只能生效一条。
 
 ## 预设文件
 
-路径：`%APPDATA%\MoonDropEQ\presets.json`（纯文本，可手改、可备份、可迁移）
+路径：`%APPDATA%\MoonDropEQ\presets.json`，纯文本，可备份或迁移。
 
 ```jsonc
 {
   "version": 2,
   "presets": [
     {
-      "id": "builtin-fps1",
-      "name": "FPS1",
-      "kind": "BuiltIn",      // BuiltIn：按索引切槽；Curve：写入 PEQ 工作区
-      "deviceId": "rays",     // 对应 Core/devices.json 里的设备 id
-      "index": 3,             // 仅 BuiltIn 使用
-      "hotkey": "Ctrl+Alt+4"  // 支持 Ctrl / Alt / Shift / Win + 字母、数字、F1–F24
+      "id": "builtin-fps1", "name": "FPS1", "kind": "BuiltIn",
+      "deviceId": "rays", "index": 3, "hotkey": "Ctrl+Alt+4"
     },
     {
-      "id": "curve-xxx",
-      "name": "CS2",
-      "kind": "Curve",
-      "deviceId": "rays",
-      "preGainDb": -7.5,
-      "globalGainDb": 0,
-      "bands": ["00 00 ...", "..."],  // 8 段，每段 33 字节十六进制
-      "hotkey": "Ctrl+Alt+6"
+      "id": "curve-cs2", "name": "CS2", "kind": "Curve",
+      "deviceId": "rays", "preGainDb": -7.5, "globalGainDb": 0,
+      "bands": ["00 00 ...", "..."], "hotkey": "Ctrl+Alt+6"
     }
   ]
 }
 ```
 
-改完文件后重启程序生效。设置页底部有「打开预设文件位置」按钮，可直接在资源管理器中定位到该文件。
+`BuiltIn` 按 `index` 切槽；`Curve` 写入 PEQ 工作区，`bands` 为 8 段、每段 33 字节的十六进制字符串。修改后重启生效；设置页底部可直接定位该文件。
 
 ## 常见问题
 
 | 现象 | 处理 |
 | --- | --- |
-| 显示「未连接」 | 确认耳机已插好；本工具会按 VID/PID 自动识别，无需选设备 |
-| 应用失败 / 写入无反应 | 官网页面可能正占用设备。关闭网页（或点网页里断开）后重试 |
-| 提示热键被占用 | 换一个组合键（改 `presets.json` 里的 `hotkey`）后重启 |
+| 显示「未连接」 | 确认耳机已插好，工具会按 VID/PID 自动识别 |
+| 应用失败 / 写入无反应 | 官网可能正占用设备，关闭网页后重试 |
+| 提示热键被占用 | 换一个组合键后重启 |
 | SmartScreen 拦截 | exe 未签名，选「更多信息 → 仍要运行」 |
 | 抓取曲线失败 | 先在官网成功应用一次，再点抓取 |
 
-## 构建
+## 构建与维护
 
 只使用 GitHub Actions 云端构建，本地无需安装 .NET SDK：
 
-- push 到 `main` → 自动构建并上传产物 `MoonDropEQ-win-x64`
-- 推送 `v*` 标签 → 自动创建 Release 并附带 zip
-- 构建前会执行 `tools/validate-devices.ps1` 校验 `Core/devices.json`
-- Actions 里的 `MoonDropEQ-win-x64` 是 GitHub 自动打包的外层 zip，里面直接是 exe 和许可证文件，不再套一层应用 zip
-- Release 资产 `MoonDropEQ-win-x64.zip` 是单独的应用压缩包
-- 工作流：`.github/workflows/build.yml`（`windows-latest` + `dotnet publish -r win-x64 --self-contained`）
+- push `main` → 构建并上传产物；push `v*` 标签 → 创建 Release
+- 构建前自动执行 `tools/validate-devices.ps1` 校验 `Core/devices.json`
+- Actions 产物外层是 GitHub 自动打包的 zip，内含 exe 与许可证；Release 资产是单独的应用 zip
+- 工作流：`.github/workflows/build.yml`
 
-## 维护
-
-协议常量、抓包方法、固件升级后的适配步骤与发版流程，见 [docs/maintenance.md](docs/maintenance.md)；新机型接入流程见 [docs/adding-device.md](docs/adding-device.md)。
+协议抓包、固件升级适配与发版流程见 [docs/maintenance.md](docs/maintenance.md)；新机型接入见 [docs/adding-device.md](docs/adding-device.md)。
 
 ## 安全说明
 
-- 只写 EQ 参数区与「保存」命令，**不触碰固件分区、不涉及 OTA 升级**
+- 只写 EQ 参数区与保存命令，**不触碰固件分区、不涉及 OTA 升级**
 - 写入内容与官网页面发出的字节完全一致
 - 每次应用会写一次 flash，正常使用频率下远低于寿命
 - 建议保留官网作为曲线编辑器，本工具负责日常快速切换
 
 ## 许可证
 
-本项目使用 [GNU General Public License v3.0](LICENSE)。
+[GNU General Public License v3.0](LICENSE)。对外分发修改版时，必须继续以 GPL-3.0 开源并提供源代码；仅自行修改、不对外分发不受限制。
 
-你可以自由使用、修改和分发本项目；如果对外分发修改后的版本，必须以 GPL-3.0 继续开源并提供对应源代码。仅自行修改、不对外分发不受限制。
-
-Copyright (C) 2026 WinGua
-
-第三方组件许可见 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。
+Copyright (C) 2026 WinGua。第三方组件许可见 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。
 
 ## 免责声明
 
