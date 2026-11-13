@@ -8,17 +8,22 @@ public static class UiScaleHelper
     public static void Apply(Window window, double baseWidth, double? baseHeight = null)
     {
         var scale = ThemeService.UiScale;
+        var workArea = SystemParameters.WorkArea;
+        var maxWidth = Math.Max(320, workArea.Width - 40);
+        var maxHeight = Math.Max(240, workArea.Height - 40);
 
         if (window.Content is FrameworkElement content)
         {
             content.LayoutTransform = new ScaleTransform(scale, scale);
         }
 
-        window.Width = baseWidth * scale;
+        window.MaxWidth = maxWidth;
+        window.MaxHeight = maxHeight;
+        window.Width = Math.Min(baseWidth * scale, maxWidth);
 
         if (baseHeight.HasValue)
         {
-            window.Height = baseHeight.Value * scale;
+            window.Height = Math.Min(baseHeight.Value * scale, maxHeight);
         }
     }
 }

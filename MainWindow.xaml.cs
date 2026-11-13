@@ -576,10 +576,14 @@ public partial class MainWindow : FluentWindow, IUiScalable
             content.LayoutTransform = new ScaleTransform(scale, scale);
         }
 
-        Width = 960 * scale + 16;
-        Height = 620 * scale + 16;
-        MinWidth = 640 * scale + 16;
-        MinHeight = 480 * scale + 16;
+        var workArea = SystemParameters.WorkArea;
+        var maxWidth = Math.Max(640, workArea.Width - 40);
+        var maxHeight = Math.Max(480, workArea.Height - 40);
+
+        MinWidth = Math.Min(640 * scale + 16, maxWidth);
+        MinHeight = Math.Min(480 * scale + 16, maxHeight);
+        Width = Math.Min(960 * scale + 16, maxWidth);
+        Height = Math.Min(620 * scale + 16, maxHeight);
 
         if (SideScaleText is not null)
         {

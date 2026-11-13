@@ -8,7 +8,8 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto"
+                      MaxWidth="820" HorizontalAlignment="Center">
             <StackPanel Margin="20,4,20,12" MaxWidth="780" HorizontalAlignment="Left">
                 <StackPanel Orientation="Horizontal">
                     <Image Width="56" Height="56" Source="/Assets/app.png"

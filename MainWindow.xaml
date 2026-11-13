@@ -59,16 +59,22 @@
                         Background="{DynamicResource AppSurfaceMutedBrush}"
                         BorderBrush="{DynamicResource AppBorderBrush}"
                         BorderThickness="1">
-                    <StackPanel Orientation="Horizontal">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
                         <Ellipse x:Name="StatusDot" Width="8" Height="8"
                                  Fill="{DynamicResource AppDangerBrush}" VerticalAlignment="Center" />
-                        <TextBlock x:Name="StatusText" Margin="8,0,0,0" Text="正在查找耳机…"
-                                   FontSize="12" VerticalAlignment="Center"
+                        <TextBlock x:Name="StatusText" Grid.Column="1" Margin="8,0,0,0"
+                                   Text="正在查找耳机…" FontSize="12" VerticalAlignment="Center"
+                                   TextTrimming="CharacterEllipsis"
                                    Foreground="{DynamicResource AppTextSecondaryBrush}" />
-                        <TextBlock x:Name="ActiveText" Margin="12,0,0,0" Text=""
+                        <TextBlock x:Name="ActiveText" Grid.Column="2" Margin="12,0,0,0" Text=""
                                    FontSize="12" VerticalAlignment="Center"
                                    Foreground="{DynamicResource AppTextTertiaryBrush}" />
-                    </StackPanel>
+                    </Grid>
                 </Border>
 
                 <Grid Grid.Row="1">
