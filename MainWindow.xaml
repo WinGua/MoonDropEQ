@@ -180,7 +180,7 @@
                                     <TextBlock Text="当前预设" FontSize="12"
                                                Foreground="{DynamicResource AppTextTertiaryBrush}" />
                                     <TextBlock x:Name="SideCurrentName" Text="未选择" FontSize="20" Margin="0,4,0,0"
-                                               Foreground="{DynamicResource AppTextPrimaryBrush}" />
+                                               Foreground="{DynamicResource AppAccentBrush}" />
                                     <TextBlock x:Name="SideCurrentMeta" Text="点击右侧卡片应用" FontSize="12"
                                                Margin="0,2,0,0" TextWrapping="Wrap"
                                                Foreground="{DynamicResource AppTextSecondaryBrush}" />
@@ -200,7 +200,7 @@
                                     <TextBlock Text="设备" FontSize="12"
                                                Foreground="{DynamicResource AppTextTertiaryBrush}" />
                                     <TextBlock x:Name="SideDeviceName" Text="未连接" FontSize="15" Margin="0,4,0,0"
-                                               Foreground="{DynamicResource AppTextPrimaryBrush}" />
+                                               Foreground="{DynamicResource AppAccentBrush}" />
                                     <TextBlock x:Name="SideDeviceMeta" Text="插入耳机后自动识别" FontSize="12"
                                                Margin="0,3,0,0" TextWrapping="Wrap" LineHeight="18"
                                                Foreground="{DynamicResource AppTextSecondaryBrush}" />
