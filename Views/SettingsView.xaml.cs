@@ -30,6 +30,16 @@ public partial class SettingsView : UserControl
         DarkThemeRadio.IsChecked = settings.Theme == ThemeMode.Dark;
         LightThemeRadio.IsChecked = settings.Theme == ThemeMode.Light;
 
+        var scale = settings.UiScalePercent;
+        Scale90Radio.IsChecked = scale == 90;
+        Scale100Radio.IsChecked = scale == 100;
+        Scale110Radio.IsChecked = scale == 110;
+        Scale125Radio.IsChecked = scale == 125;
+        if (scale is not (90 or 100 or 110 or 125))
+        {
+            Scale100Radio.IsChecked = true;
+        }
+
         _loading = false;
     }
 
@@ -89,5 +99,25 @@ public partial class SettingsView : UserControl
     private void LightTheme_Checked(object sender, RoutedEventArgs e)
     {
         UpdateSettings(settings => settings.Theme = ThemeMode.Light);
+    }
+
+    private void Scale90_Checked(object sender, RoutedEventArgs e)
+    {
+        UpdateSettings(settings => settings.UiScalePercent = 90);
+    }
+
+    private void Scale100_Checked(object sender, RoutedEventArgs e)
+    {
+        UpdateSettings(settings => settings.UiScalePercent = 100);
+    }
+
+    private void Scale110_Checked(object sender, RoutedEventArgs e)
+    {
+        UpdateSettings(settings => settings.UiScalePercent = 110);
+    }
+
+    private void Scale125_Checked(object sender, RoutedEventArgs e)
+    {
+        UpdateSettings(settings => settings.UiScalePercent = 125);
     }
 }

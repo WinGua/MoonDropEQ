@@ -22,4 +22,7 @@ public sealed class AppSettings
     public ThemeMode Theme { get; set; } = ThemeMode.Dark;
 
     public BackdropMode Backdrop { get; set; } = BackdropMode.Mica;
+
+    /// <summary>界面缩放百分比，支持 90 / 100 / 110 / 125。</summary>
+    public int UiScalePercent { get; set; } = 100;
 }

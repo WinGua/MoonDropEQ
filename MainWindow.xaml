@@ -6,8 +6,8 @@
                  xmlns:views="clr-namespace:MoonDropEQ.Views"
                  Title="MoonDropEQ"
                  Icon="/Assets/app.png"
-                 Width="560" Height="720"
-                 MinWidth="480" MinHeight="560"
+                 Width="976" Height="636"
+                 MinWidth="656" MinHeight="496"
                  WindowStartupLocation="CenterScreen"
                  WindowBackdropType="Mica"
                  ExtendsContentIntoTitleBar="True">
@@ -19,7 +19,7 @@
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="CornerRadius" Value="8" />
             <Setter Property="Padding" Value="12,10" />
-            <Setter Property="Margin" Value="0,0,0,8" />
+            <Setter Property="Margin" Value="0,0,8,8" />
             <Setter Property="Cursor" Value="Hand" />
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
@@ -30,7 +30,6 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
-
     </ui:FluentWindow.Resources>
 
     <Grid>
@@ -73,56 +72,143 @@
                 </Border>
 
                 <Grid Grid.Row="1">
-                    <ScrollViewer Margin="16,0,16,0" VerticalScrollBarVisibility="Auto">
-                        <ItemsControl x:Name="PresetList">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Border Style="{StaticResource PresetCardStyle}"
-                                            Tag="{Binding}"
-                                            MouseLeftButtonUp="PresetCard_Click"
-                                            MouseRightButtonUp="PresetCard_RightClick">
-                                        <Grid>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="Auto" />
-                                            </Grid.RowDefinitions>
+                    <Grid Margin="16,0,16,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition x:Name="SideColumn" Width="280" />
+                        </Grid.ColumnDefinitions>
 
-                                            <Grid Grid.Row="0">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="Auto" />
-                                                </Grid.ColumnDefinitions>
-                                                <StackPanel VerticalAlignment="Center">
-                                                    <TextBlock Text="{Binding Name}" FontSize="15"
-                                                               Foreground="{DynamicResource AppTextPrimaryBrush}" />
-                                                    <TextBlock Text="{Binding KindText}" FontSize="12" Margin="0,2,0,0"
+                        <Grid Grid.Column="0" Margin="0,0,16,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <Grid Grid.Row="0" Margin="0,0,0,8">
+                                <TextBlock Text="预设" FontSize="16"
+                                           Foreground="{DynamicResource AppTextPrimaryBrush}" />
+                                <TextBlock Text="点击应用 · 右键更多" HorizontalAlignment="Right"
+                                           FontSize="12" VerticalAlignment="Center"
+                                           Foreground="{DynamicResource AppTextTertiaryBrush}" />
+                            </Grid>
+
+                            <ScrollViewer Grid.Row="1" x:Name="PresetScrollViewer"
+                                          VerticalScrollBarVisibility="Auto">
+                                <ItemsControl x:Name="PresetList">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel ItemWidth="200" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Style="{StaticResource PresetCardStyle}"
+                                                    Tag="{Binding}"
+                                                    MouseLeftButtonUp="PresetCard_Click"
+                                                    MouseRightButtonUp="PresetCard_RightClick">
+                                                <Grid>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto" />
+                                                        <RowDefinition Height="Auto" />
+                                                        <RowDefinition Height="Auto" />
+                                                    </Grid.RowDefinitions>
+
+                                                    <Grid Grid.Row="0">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Text="{Binding Name}" FontSize="14"
+                                                                   TextTrimming="CharacterEllipsis"
+                                                                   Foreground="{DynamicResource AppTextPrimaryBrush}" />
+                                                        <Border Grid.Column="1" Width="6" Height="6" CornerRadius="3"
+                                                                Margin="6,0,0,0" VerticalAlignment="Center"
+                                                                Background="{DynamicResource AppAccentBrush}">
+                                                            <Border.Style>
+                                                                <Style TargetType="Border">
+                                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding IsActive}" Value="True">
+                                                                            <Setter Property="Visibility" Value="Visible" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </Border.Style>
+                                                        </Border>
+                                                    </Grid>
+
+                                                    <TextBlock Grid.Row="1" Text="{Binding KindText}" FontSize="11" Margin="0,2,0,0"
                                                                Foreground="{DynamicResource AppTextTertiaryBrush}" />
-                                                </StackPanel>
-                                                <Border Grid.Column="1" Padding="8,3" CornerRadius="4"
-                                                        VerticalAlignment="Center"
-                                                        Background="{DynamicResource AppSurfaceBrush}"
-                                                        BorderBrush="{DynamicResource AppBorderBrush}"
-                                                        BorderThickness="1">
-                                                    <TextBlock Text="{Binding HotkeyText}" FontFamily="Consolas" FontSize="12"
-                                                               Foreground="{DynamicResource AppTextSecondaryBrush}" />
-                                                </Border>
-                                            </Grid>
 
-                                            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right"
-                                                        Margin="0,10,0,0">
-                                                <Button Content="重命名" Height="28" Padding="12,0" FontSize="12"
-                                                        Tag="{Binding}" Click="Rename_Click" />
-                                                <Button Content="设置热键" Height="28" Padding="12,0" FontSize="12"
-                                                        Margin="8,0,0,0" Tag="{Binding}" Click="Hotkey_Click" />
-                                                <Button Content="删除" Height="28" Padding="12,0" FontSize="12"
-                                                        Margin="8,0,0,0" Tag="{Binding}" Click="Delete_Click" />
-                                            </StackPanel>
-                                        </Grid>
-                                    </Border>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </ScrollViewer>
+                                                    <Border Grid.Row="2" Padding="8,3" CornerRadius="4"
+                                                            Margin="0,8,0,0" HorizontalAlignment="Left"
+                                                            Background="{DynamicResource AppSurfaceBrush}"
+                                                            BorderBrush="{DynamicResource AppBorderBrush}"
+                                                            BorderThickness="1">
+                                                        <TextBlock Text="{Binding HotkeyText}" FontFamily="Consolas" FontSize="11"
+                                                                   Foreground="{DynamicResource AppTextSecondaryBrush}" />
+                                                    </Border>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Grid>
+
+                        <Border x:Name="SidePanel" Grid.Column="1"
+                                Padding="14" CornerRadius="8"
+                                Background="{DynamicResource AppSurfaceMutedBrush}"
+                                BorderBrush="{DynamicResource AppBorderBrush}"
+                                BorderThickness="1"
+                                VerticalAlignment="Stretch">
+                            <StackPanel>
+                                <TextBlock Text="当前预设" FontSize="12"
+                                           Foreground="{DynamicResource AppTextTertiaryBrush}" />
+                                <TextBlock x:Name="SideCurrentName" Text="未选择" FontSize="18" Margin="0,4,0,0"
+                                           Foreground="{DynamicResource AppTextPrimaryBrush}" />
+                                <TextBlock x:Name="SideCurrentMeta" Text="点击左侧卡片应用" FontSize="12"
+                                           Margin="0,2,0,0" TextWrapping="Wrap"
+                                           Foreground="{DynamicResource AppTextSecondaryBrush}" />
+
+                                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                    <Button x:Name="SideRenameButton" Content="重命名" Height="28" Padding="10,0"
+                                            FontSize="12" IsEnabled="False" Click="SideRename_Click" />
+                                    <Button x:Name="SideHotkeyButton" Content="热键" Height="28" Padding="10,0"
+                                            FontSize="12" Margin="6,0,0,0" IsEnabled="False" Click="SideHotkey_Click" />
+                                    <Button x:Name="SideDeleteButton" Content="删除" Height="28" Padding="10,0"
+                                            FontSize="12" Margin="6,0,0,0" IsEnabled="False" Click="SideDelete_Click" />
+                                </StackPanel>
+
+                                <Border Height="1" Margin="0,14,0,12"
+                                        Background="{DynamicResource AppBorderBrush}" />
+
+                                <TextBlock Text="设备" FontSize="12"
+                                           Foreground="{DynamicResource AppTextTertiaryBrush}" />
+                                <TextBlock x:Name="SideDeviceName" Text="未连接" FontSize="14" Margin="0,4,0,0"
+                                           Foreground="{DynamicResource AppTextPrimaryBrush}" />
+                                <TextBlock x:Name="SideDeviceMeta" Text="插入耳机后自动识别" FontSize="12"
+                                           Margin="0,3,0,0" TextWrapping="Wrap" LineHeight="18"
+                                           Foreground="{DynamicResource AppTextSecondaryBrush}" />
+
+                                <Border Height="1" Margin="0,14,0,12"
+                                        Background="{DynamicResource AppBorderBrush}" />
+
+                                <TextBlock Text="显示" FontSize="12"
+                                           Foreground="{DynamicResource AppTextTertiaryBrush}" />
+                                <Grid Margin="0,6,0,0">
+                                    <TextBlock Text="界面缩放" FontSize="12"
+                                               Foreground="{DynamicResource AppTextSecondaryBrush}" />
+                                    <TextBlock x:Name="SideScaleText" Text="100%" FontSize="12"
+                                               HorizontalAlignment="Right"
+                                               Foreground="{DynamicResource AppTextPrimaryBrush}" />
+                                </Grid>
+                                <Button Content="调整" Height="28" Padding="10,0" FontSize="12"
+                                        HorizontalAlignment="Left" Margin="0,8,0,0"
+                                        Click="SideScale_Click" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
 
                     <Border x:Name="Toast" Margin="16,0,16,16" VerticalAlignment="Bottom"
                             Padding="12,8" CornerRadius="6" Visibility="Collapsed"
@@ -145,7 +231,8 @@
                     <TextBlock Text="设置" FontSize="16" Margin="12,0,0,0" VerticalAlignment="Center"
                                Foreground="{DynamicResource AppTextPrimaryBrush}" />
                 </StackPanel>
-                <views:SettingsView x:Name="SettingsPage" Grid.Row="1" />
+                <views:SettingsView x:Name="SettingsPage" Grid.Row="1"
+                                    MaxWidth="780" HorizontalAlignment="Left" />
             </Grid>
 
             <Grid x:Name="DeviceHost" Visibility="Collapsed">
@@ -158,7 +245,8 @@
                     <TextBlock Text="设备适配" FontSize="16" Margin="12,0,0,0" VerticalAlignment="Center"
                                Foreground="{DynamicResource AppTextPrimaryBrush}" />
                 </StackPanel>
-                <views:DeviceAdapterView x:Name="DevicePage" Grid.Row="1" />
+                <views:DeviceAdapterView x:Name="DevicePage" Grid.Row="1"
+                                         MaxWidth="780" HorizontalAlignment="Left" />
             </Grid>
 
             <Grid x:Name="AboutHost" Visibility="Collapsed">
@@ -171,29 +259,20 @@
                     <TextBlock Text="关于" FontSize="16" Margin="12,0,0,0" VerticalAlignment="Center"
                                Foreground="{DynamicResource AppTextPrimaryBrush}" />
                 </StackPanel>
-                <views:AboutView Grid.Row="1" />
+                <views:AboutView Grid.Row="1" MaxWidth="780" HorizontalAlignment="Left" />
             </Grid>
         </Grid>
 
-        <Grid x:Name="FooterPanel" Grid.Row="2" Margin="16">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
+        <UniformGrid x:Name="FooterGrid" Grid.Row="2" Columns="4" Margin="12,8,12,12">
             <ui:Button x:Name="CaptureButton" Content="抓取曲线" Height="36"
-                       Appearance="Primary" HorizontalAlignment="Stretch"
+                       Appearance="Primary" Margin="4,2"
                        Click="CaptureButton_Click" />
-            <ui:Button Grid.Column="1" Content="设备适配" Height="36" Margin="8,0,0,0"
-                       Appearance="Secondary" HorizontalAlignment="Stretch"
-                       Click="Device_Click" />
-            <ui:Button Grid.Column="2" Content="设置" Height="36" Margin="8,0,0,0"
-                       Appearance="Secondary" HorizontalAlignment="Stretch"
-                       Click="Settings_Click" />
-            <ui:Button Grid.Column="3" Content="关于" Height="36" Margin="8,0,0,0"
-                       Appearance="Secondary" HorizontalAlignment="Stretch"
-                       Click="About_Click" />
-        </Grid>
+            <ui:Button Content="设备适配" Height="36" Margin="4,2"
+                       Appearance="Secondary" Click="Device_Click" />
+            <ui:Button Content="设置" Height="36" Margin="4,2"
+                       Appearance="Secondary" Click="Settings_Click" />
+            <ui:Button Content="关于" Height="36" Margin="4,2"
+                       Appearance="Secondary" Click="About_Click" />
+        </UniformGrid>
     </Grid>
 </ui:FluentWindow>

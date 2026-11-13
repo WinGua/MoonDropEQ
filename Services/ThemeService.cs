@@ -9,6 +9,8 @@ public static class ThemeService
 {
     private const string BrushDictionaryMarker = "Themes/App";
 
+    private static double _lastAppliedScale = double.NaN;
+
     public static AppSettings Current { get; private set; } = new();
 
     public static WindowBackdropType CurrentBackdrop => Current.Backdrop switch
@@ -17,6 +19,21 @@ public static class ThemeService
         BackdropMode.Solid => WindowBackdropType.None,
         _ => WindowBackdropType.Mica
     };
+
+    public static double UiScale
+    {
+        get
+        {
+            var percent = Current.UiScalePercent switch
+            {
+                90 => 90,
+                110 => 110,
+                125 => 125,
+                _ => 100
+            };
+            return percent / 100.0;
+        }
+    }
 
     public static void ApplyBackdrop(FluentWindow window)
     {
@@ -48,6 +65,10 @@ public static class ThemeService
         };
 
         var backdrop = CurrentBackdrop;
+        var scale = UiScale;
+        var scaleChanged = double.IsNaN(_lastAppliedScale)
+            || Math.Abs(_lastAppliedScale - scale) > 0.001;
+        _lastAppliedScale = scale;
 
         try
         {
@@ -62,6 +83,18 @@ public static class ThemeService
 
         foreach (Window window in Application.Current.Windows)
         {
+            if (scaleChanged && window is IUiScalable scalable)
+            {
+                try
+                {
+                    scalable.ApplyUiScale(scale);
+                }
+                catch
+                {
+                    // 单个窗口缩放失败不影响其他窗口
+                }
+            }
+
             if (window is not FluentWindow fluent)
             {
                 continue;
@@ -122,4 +155,9 @@ public static class ThemeService
 
         merged.Insert(Math.Min(index, merged.Count), dictionary);
     }
+}
+
+public interface IUiScalable
+{
+    void ApplyUiScale(double scale);
 }

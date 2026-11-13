@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
 using MoonDropEQ.Core;
 using MoonDropEQ.Models;
@@ -12,7 +13,7 @@ using Wpf.Ui.Controls;
 
 namespace MoonDropEQ;
 
-public partial class MainWindow : FluentWindow
+public partial class MainWindow : FluentWindow, IUiScalable
 {
     private readonly PresetStore _store = new();
     private readonly ObservableCollection<PresetItem> _items = new();
@@ -31,6 +32,9 @@ public partial class MainWindow : FluentWindow
     {
         InitializeComponent();
         ThemeService.ApplyBackdrop(this);
+        ApplyUiScale(ThemeService.UiScale);
+        SizeChanged += (_, _) => UpdateResponsiveLayout();
+        UpdateResponsiveLayout();
 
         _toastTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
         _toastTimer.Tick += (_, _) =>
@@ -103,6 +107,7 @@ public partial class MainWindow : FluentWindow
         if (found is null)
         {
             UpdateConnection(false, "未连接（插上耳机后重试一次应用）");
+            UpdateSideDevice(null, false);
             return;
         }
 
@@ -123,6 +128,11 @@ public partial class MainWindow : FluentWindow
         if (_device is not null)
         {
             ApplyProfile(_device.Profile);
+        }
+
+        if (_device is null)
+        {
+            UpdateSideDevice(null, false);
         }
 
         UpdateConnection(
@@ -199,6 +209,7 @@ public partial class MainWindow : FluentWindow
             _device?.Dispose();
             _device = null;
             UpdateConnection(false, "连接中断，请重新插拔耳机");
+            UpdateSideDevice(null, false);
             ShowToast($"应用失败：{ex.Message}", true);
         }
         finally
@@ -352,30 +363,6 @@ public partial class MainWindow : FluentWindow
         return null;
     }
 
-    private void Rename_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is FrameworkElement { Tag: PresetItem item })
-        {
-            RenamePreset(item.Model);
-        }
-    }
-
-    private void Hotkey_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is FrameworkElement { Tag: PresetItem item })
-        {
-            EditHotkey(item.Model);
-        }
-    }
-
-    private void Delete_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is FrameworkElement { Tag: PresetItem item })
-        {
-            DeletePreset(item.Model);
-        }
-    }
-
     private void PresetCard_RightClick(object sender, MouseButtonEventArgs e)
     {
         if (sender is not FrameworkElement { Tag: PresetItem item })
@@ -495,6 +482,7 @@ public partial class MainWindow : FluentWindow
         }
 
         RefreshItems();
+        SetActive(_activePreset);
         RegisterHotkeys();
         _tray?.Update(ActivePresets);
         ShowToast($"已删除：{preset.Name}");
@@ -514,6 +502,7 @@ public partial class MainWindow : FluentWindow
 
         _store.EnsureDefaultsForDevice(profile);
         CaptureButton.IsEnabled = profile.Capabilities.Curve;
+        UpdateSideDevice(profile, true);
         RefreshItems();
         if (changed)
         {
@@ -544,11 +533,95 @@ public partial class MainWindow : FluentWindow
         if (preset is null)
         {
             ActiveText.Text = string.Empty;
+            SideCurrentName.Text = "未选择";
+            SideCurrentMeta.Text = "点击左侧卡片应用";
         }
         else
         {
             ActiveText.Text = $"当前：{preset.Name}";
+            SideCurrentName.Text = preset.Name;
+            SideCurrentMeta.Text =
+                $"{(preset.Kind == PresetKind.BuiltIn ? "内置预设" : "自定义曲线")} · "
+                + (string.IsNullOrWhiteSpace(preset.Hotkey) ? "未设置热键" : preset.Hotkey);
         }
+
+        var hasPreset = preset is not null;
+        SideRenameButton.IsEnabled = hasPreset;
+        SideHotkeyButton.IsEnabled = hasPreset;
+        SideDeleteButton.IsEnabled = hasPreset;
+    }
+
+    private void UpdateSideDevice(DeviceProfile? profile, bool connected)
+    {
+        if (profile is null)
+        {
+            SideDeviceName.Text = "未连接";
+            SideDeviceMeta.Text = "插入耳机后自动识别";
+            return;
+        }
+
+        var productId = profile.ProductIdValues.FirstOrDefault();
+        SideDeviceName.Text = profile.Name;
+        SideDeviceMeta.Text =
+            $"VID 0x{profile.VendorIdValue:X4} / PID 0x{productId:X4}\n"
+            + $"{profile.BandCount} 段 PEQ · {(connected ? "已连接" : "未连接")}";
+    }
+
+    public void ApplyUiScale(double scale)
+    {
+        scale = Math.Clamp(scale, 0.8, 1.5);
+
+        if (Content is FrameworkElement content)
+        {
+            content.LayoutTransform = new ScaleTransform(scale, scale);
+        }
+
+        Width = 960 * scale + 16;
+        Height = 620 * scale + 16;
+        MinWidth = 640 * scale + 16;
+        MinHeight = 480 * scale + 16;
+
+        if (SideScaleText is not null)
+        {
+            SideScaleText.Text = $"{Math.Round(scale * 100)}%";
+        }
+    }
+
+    private void UpdateResponsiveLayout()
+    {
+        var wide = ActualWidth >= 840;
+        SidePanel.Visibility = wide ? Visibility.Visible : Visibility.Collapsed;
+        SideColumn.Width = wide ? new GridLength(280) : new GridLength(0);
+        FooterGrid.Columns = wide ? 4 : 2;
+    }
+
+    private void SideRename_Click(object sender, RoutedEventArgs e)
+    {
+        if (_activePreset is not null)
+        {
+            RenamePreset(_activePreset);
+        }
+    }
+
+    private void SideHotkey_Click(object sender, RoutedEventArgs e)
+    {
+        if (_activePreset is not null)
+        {
+            EditHotkey(_activePreset);
+        }
+    }
+
+    private void SideDelete_Click(object sender, RoutedEventArgs e)
+    {
+        if (_activePreset is not null)
+        {
+            DeletePreset(_activePreset);
+        }
+    }
+
+    private void SideScale_Click(object sender, RoutedEventArgs e)
+    {
+        ShowPage(SettingsHost);
     }
 
     private void UpdateConnection(bool? connected, string message)

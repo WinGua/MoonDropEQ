@@ -33,9 +33,22 @@
             <RadioButton x:Name="LightThemeRadio" GroupName="Theme" Content="浅色"
                          Margin="0,4,0,0" Checked="LightTheme_Checked" />
 
+            <Border Height="1" Margin="0,16,0,16" Background="{DynamicResource AppBorderBrush}" />
+
+            <TextBlock Text="界面缩放" FontSize="14"
+                       Foreground="{DynamicResource AppTextPrimaryBrush}" />
+            <RadioButton x:Name="Scale90Radio" GroupName="UiScale" Content="90%（紧凑）"
+                         Margin="0,10,0,0" Checked="Scale90_Checked" />
+            <RadioButton x:Name="Scale100Radio" GroupName="UiScale" Content="100%（标准）"
+                         Margin="0,4,0,0" Checked="Scale100_Checked" />
+            <RadioButton x:Name="Scale110Radio" GroupName="UiScale" Content="110%（较大）"
+                         Margin="0,4,0,0" Checked="Scale110_Checked" />
+            <RadioButton x:Name="Scale125Radio" GroupName="UiScale" Content="125%（最大）"
+                         Margin="0,4,0,0" Checked="Scale125_Checked" />
+
             <TextBlock Margin="0,18,0,0" FontSize="12" TextWrapping="Wrap" LineHeight="18"
                        Foreground="{DynamicResource AppTextTertiaryBrush}"
-                       Text="材质与主题会立即生效；设置保存在 %APPDATA%\MoonDropEQ\settings.json" />
+                       Text="材质、主题与界面缩放会立即生效；设置保存在 %APPDATA%\MoonDropEQ\settings.json" />
 
             <Border Height="1" Margin="0,16,0,16" Background="{DynamicResource AppBorderBrush}" />
 
