@@ -78,13 +78,13 @@
                 </Border>
 
                 <Grid Grid.Row="1">
-                    <Grid>
+                    <Grid Margin="16,0,16,0">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition x:Name="SideColumn" Width="260" />
+                            <ColumnDefinition x:Name="SideColumn" Width="250" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        <Grid Grid.Column="1" Margin="16,0,16,0">
+                        <Grid Grid.Column="1" Margin="0">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
@@ -163,51 +163,45 @@
                         </Grid>
 
                         <Border x:Name="SidePanel" Grid.Column="0"
-                                Padding="16"
-                                Background="{DynamicResource AppSurfaceMutedBrush}"
+                                Padding="14" CornerRadius="8"
+                                Margin="0,0,12,0"
+                                Background="{DynamicResource AppSurfaceBrush}"
                                 BorderBrush="{DynamicResource AppBorderBrush}"
-                                BorderThickness="0,0,1,0">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="*" />
-                                    <RowDefinition Height="Auto" />
-                                </Grid.RowDefinitions>
+                                BorderThickness="1"
+                                VerticalAlignment="Top">
+                            <StackPanel>
+                                <TextBlock Text="当前预设" FontSize="12"
+                                           Foreground="{DynamicResource AppTextTertiaryBrush}" />
+                                <TextBlock x:Name="SideCurrentName" Text="未选择" FontSize="20" Margin="0,4,0,0"
+                                           Foreground="{DynamicResource AppTextPrimaryBrush}" />
+                                <TextBlock x:Name="SideCurrentMeta" Text="点击右侧卡片应用" FontSize="12"
+                                           Margin="0,2,0,0" TextWrapping="Wrap"
+                                           Foreground="{DynamicResource AppTextSecondaryBrush}" />
 
-                                <StackPanel Grid.Row="0">
-                                    <TextBlock Text="当前预设" FontSize="12"
-                                               Foreground="{DynamicResource AppTextTertiaryBrush}" />
-                                    <TextBlock x:Name="SideCurrentName" Text="未选择" FontSize="20" Margin="0,4,0,0"
-                                               Foreground="{DynamicResource AppTextPrimaryBrush}" />
-                                    <TextBlock x:Name="SideCurrentMeta" Text="点击右侧卡片应用" FontSize="12"
-                                               Margin="0,2,0,0" TextWrapping="Wrap"
-                                               Foreground="{DynamicResource AppTextSecondaryBrush}" />
-
-                                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-                                        <Button x:Name="SideRenameButton" Content="重命名" Height="28" Padding="10,0"
-                                                FontSize="12" IsEnabled="False" Click="SideRename_Click" />
-                                        <Button x:Name="SideHotkeyButton" Content="热键" Height="28" Padding="10,0"
-                                                FontSize="12" Margin="6,0,0,0" IsEnabled="False" Click="SideHotkey_Click" />
-                                        <Button x:Name="SideDeleteButton" Content="删除" Height="28" Padding="10,0"
-                                                FontSize="12" Margin="6,0,0,0" IsEnabled="False" Click="SideDelete_Click" />
-                                    </StackPanel>
-
-                                    <Border Height="1" Margin="0,16,0,14"
-                                            Background="{DynamicResource AppBorderBrush}" />
-
-                                    <TextBlock Text="设备" FontSize="12"
-                                               Foreground="{DynamicResource AppTextTertiaryBrush}" />
-                                    <TextBlock x:Name="SideDeviceName" Text="未连接" FontSize="15" Margin="0,4,0,0"
-                                               Foreground="{DynamicResource AppTextPrimaryBrush}" />
-                                    <TextBlock x:Name="SideDeviceMeta" Text="插入耳机后自动识别" FontSize="12"
-                                               Margin="0,3,0,0" TextWrapping="Wrap" LineHeight="18"
-                                               Foreground="{DynamicResource AppTextSecondaryBrush}" />
+                                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                    <Button x:Name="SideRenameButton" Content="重命名" Height="28" Padding="10,0"
+                                            FontSize="12" IsEnabled="False" Click="SideRename_Click" />
+                                    <Button x:Name="SideHotkeyButton" Content="热键" Height="28" Padding="10,0"
+                                            FontSize="12" Margin="6,0,0,0" IsEnabled="False" Click="SideHotkey_Click" />
+                                    <Button x:Name="SideDeleteButton" Content="删除" Height="28" Padding="10,0"
+                                            FontSize="12" Margin="6,0,0,0" IsEnabled="False" Click="SideDelete_Click" />
                                 </StackPanel>
 
-                                <TextBlock Grid.Row="2" Text="右键预设可以重命名、设置热键或删除。"
-                                           FontSize="12" TextWrapping="Wrap" LineHeight="18"
+                                <Border Height="1" Margin="0,16,0,14"
+                                        Background="{DynamicResource AppBorderBrush}" />
+
+                                <TextBlock Text="设备" FontSize="12"
                                            Foreground="{DynamicResource AppTextTertiaryBrush}" />
-                            </Grid>
+                                <TextBlock x:Name="SideDeviceName" Text="未连接" FontSize="15" Margin="0,4,0,0"
+                                           Foreground="{DynamicResource AppTextPrimaryBrush}" />
+                                <TextBlock x:Name="SideDeviceMeta" Text="插入耳机后自动识别" FontSize="12"
+                                           Margin="0,3,0,0" TextWrapping="Wrap" LineHeight="18"
+                                           Foreground="{DynamicResource AppTextSecondaryBrush}" />
+
+                                <TextBlock Text="右键预设可以重命名、设置热键或删除。"
+                                           Margin="0,16,0,0" FontSize="12" TextWrapping="Wrap" LineHeight="18"
+                                           Foreground="{DynamicResource AppTextTertiaryBrush}" />
+                            </StackPanel>
                         </Border>
                     </Grid>
 
@@ -246,6 +240,19 @@
                                Foreground="{DynamicResource AppTextPrimaryBrush}" />
                 </StackPanel>
                 <views:DeviceAdapterView x:Name="DevicePage" Grid.Row="1" />
+            </Grid>
+
+            <Grid x:Name="CaptureHost" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="16,4,16,10">
+                    <Button Content="← 返回" Height="32" Padding="12,0" Click="Back_Click" />
+                    <TextBlock Text="设备采集" FontSize="16" Margin="12,0,0,0" VerticalAlignment="Center"
+                               Foreground="{DynamicResource AppTextPrimaryBrush}" />
+                </StackPanel>
+                <views:DeviceCaptureView x:Name="CapturePage" Grid.Row="1" />
             </Grid>
 
             <Grid x:Name="AboutHost" Visibility="Collapsed">

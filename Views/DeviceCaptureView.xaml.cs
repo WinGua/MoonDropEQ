@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -7,16 +6,16 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using MoonDropEQ.Core;
 using MoonDropEQ.Services;
-using Wpf.Ui.Controls;
 
 namespace MoonDropEQ.Views;
 
-public partial class DeviceCaptureDialog : FluentWindow
+public partial class DeviceCaptureView : UserControl
 {
-    private readonly HidCaptureSession _session = new();
+    private HidCaptureSession _session = new();
 
     private CancellationTokenSource? _cts;
     private Task? _pollTask;
@@ -24,11 +23,42 @@ public partial class DeviceCaptureDialog : FluentWindow
     private bool _started;
     private bool _packaging;
 
-    public DeviceCaptureDialog()
+    public DeviceCaptureView()
     {
         InitializeComponent();
-        ThemeService.ApplyBackdrop(this);
-        UiScaleHelper.Apply(this, 560, 640);
+    }
+
+    public event EventHandler? CancelRequested;
+
+    public void Reset()
+    {
+        Stop();
+        _session = new HidCaptureSession();
+        _frameCount = 0;
+        _started = false;
+        _packaging = false;
+
+        StatusText.Text = "请先插好耳机，然后点「开始采集」。";
+        DetailText.Text = "等待开始。";
+        ResetCheck(BuiltInCheck, "内置预设（默认）");
+        ResetCheck(CurveCheck, "自定义曲线（8 段 + 提交）");
+        ResetCheck(SavedCheck, "保存命令");
+
+        StartButton.Visibility = Visibility.Visible;
+        StartButton.IsEnabled = true;
+        FinishButton.Visibility = Visibility.Visible;
+        FinishButton.IsEnabled = false;
+        OpenFolderButton.Visibility = Visibility.Collapsed;
+        CancelButton.Content = "取消";
+    }
+
+    public void Stop()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
+        _cts = null;
+        _pollTask = null;
+        _ = _session.DisposeAsync().AsTask();
     }
 
     private async void Start_Click(object sender, RoutedEventArgs e)
@@ -246,19 +276,8 @@ public partial class DeviceCaptureDialog : FluentWindow
             return;
         }
 
-        Close();
-    }
-
-    private void OnClosing(object? sender, CancelEventArgs e)
-    {
-        if (_packaging)
-        {
-            e.Cancel = true;
-            return;
-        }
-
-        _cts?.Cancel();
-        _ = _session.DisposeAsync().AsTask();
+        Stop();
+        CancelRequested?.Invoke(this, EventArgs.Empty);
     }
 
     private void UpdateChecklist(CaptureSnapshot snapshot)
@@ -268,10 +287,16 @@ public partial class DeviceCaptureDialog : FluentWindow
         SetCheck(SavedCheck, snapshot.Saved, "保存命令");
     }
 
-    private void SetCheck(System.Windows.Controls.TextBlock target, bool done, string label)
+    private void SetCheck(TextBlock target, bool done, string label)
     {
         target.Text = (done ? "● " : "○ ") + label;
         target.Foreground = (Brush)FindResource(done ? "AppSuccessBrush" : "AppTextTertiaryBrush");
+    }
+
+    private void ResetCheck(TextBlock target, string label)
+    {
+        target.Text = "○ " + label;
+        target.Foreground = (Brush)FindResource("AppTextTertiaryBrush");
     }
 
     private void SetStatus(string text)

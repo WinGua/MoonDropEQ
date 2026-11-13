@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -13,6 +14,8 @@ public partial class DeviceAdapterView : UserControl
     {
         InitializeComponent();
     }
+
+    public event EventHandler? CaptureRequested;
 
     public void RefreshStatus()
     {
@@ -51,12 +54,7 @@ public partial class DeviceAdapterView : UserControl
 
     private void Capture_Click(object sender, RoutedEventArgs e)
     {
-        var dialog = new DeviceCaptureDialog
-        {
-            Owner = Window.GetWindow(this)
-        };
-        dialog.ShowDialog();
-        RefreshStatus();
+        CaptureRequested?.Invoke(this, EventArgs.Empty);
     }
 
     private void OpenData_Click(object sender, RoutedEventArgs e)

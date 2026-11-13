@@ -49,6 +49,16 @@ public partial class MainWindow : FluentWindow, IUiScalable
         PresetList.ItemsSource = _items;
         RefreshItems();
         SettingsPage.OpenPresetFileRequested += (_, _) => OpenPresetFile();
+        DevicePage.CaptureRequested += (_, _) =>
+        {
+            CapturePage.Reset();
+            ShowPage(CaptureHost);
+        };
+        CapturePage.CancelRequested += (_, _) =>
+        {
+            DevicePage.RefreshStatus();
+            ShowPage(DeviceHost);
+        };
 
         SourceInitialized += (_, _) => SetupInfrastructure();
         Loaded += async (_, _) => await DetectDeviceAsync();
@@ -307,8 +317,17 @@ public partial class MainWindow : FluentWindow, IUiScalable
 
     private void Back_Click(object sender, RoutedEventArgs e)
     {
+        if (CaptureHost.Visibility == Visibility.Visible)
+        {
+            CapturePage.Stop();
+            DevicePage.RefreshStatus();
+            ShowPage(DeviceHost);
+            return;
+        }
+
         SettingsHost.Visibility = Visibility.Collapsed;
         DeviceHost.Visibility = Visibility.Collapsed;
+        CaptureHost.Visibility = Visibility.Collapsed;
         AboutHost.Visibility = Visibility.Collapsed;
         MainView.Visibility = Visibility.Visible;
         FooterPanel.Visibility = Visibility.Visible;
@@ -325,6 +344,7 @@ public partial class MainWindow : FluentWindow, IUiScalable
         FooterPanel.Visibility = Visibility.Collapsed;
         SettingsHost.Visibility = Visibility.Collapsed;
         DeviceHost.Visibility = Visibility.Collapsed;
+        CaptureHost.Visibility = Visibility.Collapsed;
         AboutHost.Visibility = Visibility.Collapsed;
         host.Visibility = Visibility.Visible;
     }
@@ -590,7 +610,7 @@ public partial class MainWindow : FluentWindow, IUiScalable
     {
         var wide = ActualWidth >= 840;
         SidePanel.Visibility = wide ? Visibility.Visible : Visibility.Collapsed;
-        SideColumn.Width = wide ? new GridLength(260) : new GridLength(0);
+        SideColumn.Width = wide ? new GridLength(250) : new GridLength(0);
     }
 
     private void SideRename_Click(object sender, RoutedEventArgs e)
@@ -654,6 +674,7 @@ public partial class MainWindow : FluentWindow, IUiScalable
 
     private void DisposeInfrastructure()
     {
+        CapturePage.Stop();
         _hotkeys?.Dispose();
         _hotkeys = null;
         _tray?.Dispose();
@@ -672,6 +693,7 @@ public partial class MainWindow : FluentWindow, IUiScalable
         if (ThemeService.Current.CloseToTray)
         {
             e.Cancel = true;
+            CapturePage.Stop();
             Hide();
             return;
         }
