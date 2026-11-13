@@ -37,7 +37,7 @@
 
 - push `main` → 构建；push `v*` 标签 → 发布 Release
 - 构建前自动执行 `tools/validate-devices.ps1` 校验 `Core/devices.json`
-- 产物只有 `MoonDropEQ.exe`：Actions artifact 会被自动打包成 zip，Release 直接提供 exe
+- 产物只有 `MoonDropEQ.exe`：Actions artifact 会被自动打包成 zip，Release 提供压缩包
 - 工作流：`.github/workflows/build.yml`
 
 协议抓包、固件升级适配与发版流程见 [docs/maintenance.md](docs/maintenance.md)。

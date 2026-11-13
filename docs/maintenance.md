@@ -231,7 +231,7 @@ git tag -a v0.2.0 -m "MoonDropEQ v0.2.0"
 git push origin v0.2.0
 ```
 
-4. workflow 会创建 Release 并直接上传 `MoonDropEQ.exe`
+4. workflow 会创建 Release 并上传 `MoonDropEQ-win-x64.zip`
 
 **重发同一版本**（覆盖已有 Release 附件）：
 
