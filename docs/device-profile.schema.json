@@ -15,7 +15,6 @@
     "bandCount",
     "bandPayloadSize",
     "curveSlot",
-    "slots",
     "commands",
     "capabilities",
     "timing"
@@ -73,6 +72,7 @@
     },
     "slots": {
       "type": "array",
+      "description": "内置预设槽位；capabilities.builtInSlots 为 false 时可省略",
       "items": {
         "type": "object",
         "required": ["index", "name"],

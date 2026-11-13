@@ -544,6 +544,8 @@ public partial class MainWindow : FluentWindow, IUiScalable
         {
             _items.Add(new PresetItem(preset));
         }
+
+        EmptyPresetText.Visibility = _items.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private void SetActive(Preset? preset)

@@ -144,6 +144,7 @@ foreach ($profile in $profiles) {
         }
     }
 
+    $hasBuiltIn = $false
     if ($null -eq $profile.capabilities) {
         Add-Error $label '缺少 capabilities'
     }
@@ -152,6 +153,9 @@ foreach ($profile in $profiles) {
             if (-not (Test-Boolean $profile.capabilities.$key)) {
                 Add-Error $label "capabilities.$key 必须是布尔值"
             }
+        }
+        if ($profile.capabilities.builtInSlots -is [bool]) {
+            $hasBuiltIn = $profile.capabilities.builtInSlots
         }
     }
 
@@ -167,8 +171,16 @@ foreach ($profile in $profiles) {
         }
     }
 
-    if ($null -eq $profile.slots -or $profile.slots -isnot [System.Array] -or $profile.slots.Count -eq 0) {
-        Add-Error $label 'slots 必须是非空数组'
+    if ($null -eq $profile.slots) {
+        if ($hasBuiltIn) {
+            Add-Error $label 'builtInSlots 为 true 时必须提供 slots'
+        }
+    }
+    elseif ($profile.slots -isnot [System.Array]) {
+        Add-Error $label 'slots 必须是数组'
+    }
+    elseif ($hasBuiltIn -and $profile.slots.Count -eq 0) {
+        Add-Error $label 'builtInSlots 为 true 时 slots 不能为空'
     }
     else {
         $slotIndexes = @{}

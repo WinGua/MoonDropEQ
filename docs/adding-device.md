@@ -156,7 +156,7 @@ CI 在构建前也会执行同一个脚本，字段写错会直接让构建失�
 | `readOp` / `writeOp` | 读 / 写操作码，通常是 `0x80` / `0x01` |
 | `bandCount` / `bandPayloadSize` | PEQ 段数与单段字节数 |
 | `curveSlot` | 自定义曲线使用的 PEQ 工作槽 |
-| `slots` | 内置预设槽位与名称 |
+| `slots` | 内置预设槽位与名称；`builtInSlots` 为 false 时可省略 |
 | `commands` | 槽位、段、提交、增益、保存命令字 |
 | `capabilities` | 是否支持内置槽位、曲线、增益、提交、双通道 |
 | `timing` | 切换、逐段写入、保存后的等待时间 |
