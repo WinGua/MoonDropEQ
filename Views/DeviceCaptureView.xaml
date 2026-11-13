@@ -21,7 +21,7 @@
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" FontSize="13" LineHeight="21" TextWrapping="Wrap"
-                   Foreground="{DynamicResource AppTextSecondaryBrush}"
+                   Foreground="{DynamicResource AppAccentBrush}"
                    Text="采集只读取耳机信息，不会写入任何设置。请先插好耳机，再按提示在浏览器里完成两次操作。" />
 
         <TextBlock x:Name="StatusText" Grid.Row="1" Margin="0,16,0,0" FontSize="14"

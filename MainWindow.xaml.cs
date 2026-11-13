@@ -34,6 +34,7 @@ public partial class MainWindow : FluentWindow, IUiScalable
         ThemeService.ApplyBackdrop(this);
         ApplyUiScale(ThemeService.UiScale);
         SizeChanged += (_, _) => UpdateResponsiveLayout();
+        PresetScrollViewer.SizeChanged += (_, _) => UpdatePresetLayout();
         UpdateResponsiveLayout();
 
         _toastTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
@@ -539,6 +540,8 @@ public partial class MainWindow : FluentWindow, IUiScalable
         {
             _items.Add(new PresetItem(preset));
         }
+
+        UpdatePresetLayout();
     }
 
     private void SetActive(Preset? preset)
@@ -601,16 +604,65 @@ public partial class MainWindow : FluentWindow, IUiScalable
         var maxHeight = Math.Max(480, workArea.Height - 40);
 
         MinWidth = Math.Min(640 * scale + 16, maxWidth);
-        MinHeight = Math.Min(480 * scale + 16, maxHeight);
+        MinHeight = Math.Min(440 * scale + 16, maxHeight);
         Width = Math.Min(960 * scale + 16, maxWidth);
-        Height = Math.Min(620 * scale + 16, maxHeight);
+        Height = Math.Min(540 * scale + 16, maxHeight);
     }
 
     private void UpdateResponsiveLayout()
     {
-        var wide = ActualWidth >= 840;
+        var wide = ActualWidth >= 800;
         SidePanel.Visibility = wide ? Visibility.Visible : Visibility.Collapsed;
         SideColumn.Width = wide ? new GridLength(250) : new GridLength(0);
+        FooterPanel.Width = Math.Min(760, Math.Max(320, ActualWidth - 48));
+        UpdatePresetLayout();
+    }
+
+    private void UpdatePresetLayout()
+    {
+        var available = PresetScrollViewer.ActualWidth - 12;
+        if (available <= 0)
+        {
+            return;
+        }
+
+        var panel = FindVisualChild<WrapPanel>(PresetList);
+        if (panel is null)
+        {
+            return;
+        }
+
+        var columns = available >= 640 ? 3 : available >= 420 ? 2 : 1;
+        const double gap = 6;
+        panel.ItemWidth = Math.Max(
+            160,
+            (available - (columns - 1) * gap) / columns - gap);
+    }
+
+    private static T? FindVisualChild<T>(DependencyObject? parent)
+        where T : DependencyObject
+    {
+        if (parent is null)
+        {
+            return null;
+        }
+
+        for (var index = 0; index < VisualTreeHelper.GetChildrenCount(parent); index++)
+        {
+            var child = VisualTreeHelper.GetChild(parent, index);
+            if (child is T typed)
+            {
+                return typed;
+            }
+
+            var nested = FindVisualChild<T>(child);
+            if (nested is not null)
+            {
+                return nested;
+            }
+        }
+
+        return null;
     }
 
     private void SideRename_Click(object sender, RoutedEventArgs e)

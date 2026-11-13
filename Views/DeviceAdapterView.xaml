@@ -67,7 +67,7 @@
                        Foreground="{DynamicResource AppTextTertiaryBrush}" />
 
             <TextBlock Margin="0,18,0,0" FontSize="12" LineHeight="20" TextWrapping="Wrap"
-                       Foreground="{DynamicResource AppTextTertiaryBrush}"
+                       Foreground="{DynamicResource AppAccentBrush}"
                        Text="采集流程：插好耳机 → 点「设备采集」→ 在打开的网页里应用一次「默认」和一条「自定义曲线」→ 点「完成采集」→ 点「采集提交」。" />
         </StackPanel>
     </ScrollViewer>

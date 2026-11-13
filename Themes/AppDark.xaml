@@ -14,5 +14,5 @@
     <SolidColorBrush x:Key="AppSuccessBrush" Color="#6BDB9A" />
     <SolidColorBrush x:Key="AppToastBrush" Color="#E61E1E1E" />
 
-    <SolidColorBrush x:Key="AppMenuBackgroundBrush" Color="#F21B1B1B" />
+    <SolidColorBrush x:Key="AppMenuBackgroundBrush" Color="#F21E1F22" />
 </ResourceDictionary>
