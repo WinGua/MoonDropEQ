@@ -9,7 +9,7 @@
         </Grid.RowDefinitions>
 
         <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
-            <StackPanel Margin="20,4,20,12">
+            <StackPanel Margin="20,4,20,12" MaxWidth="780" HorizontalAlignment="Left">
                 <StackPanel Orientation="Horizontal">
                     <Image Width="56" Height="56" Source="/Assets/app.png"
                            RenderOptions.BitmapScalingMode="HighQuality" />

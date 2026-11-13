@@ -161,7 +161,7 @@
                                 Background="{DynamicResource AppSurfaceMutedBrush}"
                                 BorderBrush="{DynamicResource AppBorderBrush}"
                                 BorderThickness="1"
-                                VerticalAlignment="Stretch">
+                                VerticalAlignment="Top">
                             <StackPanel>
                                 <TextBlock Text="当前预设" FontSize="12"
                                            Foreground="{DynamicResource AppTextTertiaryBrush}" />
@@ -231,8 +231,7 @@
                     <TextBlock Text="设置" FontSize="16" Margin="12,0,0,0" VerticalAlignment="Center"
                                Foreground="{DynamicResource AppTextPrimaryBrush}" />
                 </StackPanel>
-                <views:SettingsView x:Name="SettingsPage" Grid.Row="1"
-                                    MaxWidth="780" HorizontalAlignment="Left" />
+                <views:SettingsView x:Name="SettingsPage" Grid.Row="1" />
             </Grid>
 
             <Grid x:Name="DeviceHost" Visibility="Collapsed">
@@ -245,8 +244,7 @@
                     <TextBlock Text="设备适配" FontSize="16" Margin="12,0,0,0" VerticalAlignment="Center"
                                Foreground="{DynamicResource AppTextPrimaryBrush}" />
                 </StackPanel>
-                <views:DeviceAdapterView x:Name="DevicePage" Grid.Row="1"
-                                         MaxWidth="780" HorizontalAlignment="Left" />
+                <views:DeviceAdapterView x:Name="DevicePage" Grid.Row="1" />
             </Grid>
 
             <Grid x:Name="AboutHost" Visibility="Collapsed">
@@ -259,20 +257,21 @@
                     <TextBlock Text="关于" FontSize="16" Margin="12,0,0,0" VerticalAlignment="Center"
                                Foreground="{DynamicResource AppTextPrimaryBrush}" />
                 </StackPanel>
-                <views:AboutView Grid.Row="1" MaxWidth="780" HorizontalAlignment="Left" />
+                <views:AboutView Grid.Row="1" />
             </Grid>
         </Grid>
 
-        <UniformGrid x:Name="FooterPanel" Grid.Row="2" Columns="4" Margin="12,8,12,12">
-            <ui:Button x:Name="CaptureButton" Content="抓取曲线" Height="36"
+        <WrapPanel x:Name="FooterPanel" Grid.Row="2"
+                   HorizontalAlignment="Center" Margin="12,8,12,12">
+            <ui:Button x:Name="CaptureButton" Content="抓取曲线" Width="150" Height="36"
                        Appearance="Primary" Margin="4,2"
                        Click="CaptureButton_Click" />
-            <ui:Button Content="设备适配" Height="36" Margin="4,2"
+            <ui:Button Content="设备适配" Width="150" Height="36" Margin="4,2"
                        Appearance="Secondary" Click="Device_Click" />
-            <ui:Button Content="设置" Height="36" Margin="4,2"
+            <ui:Button Content="设置" Width="150" Height="36" Margin="4,2"
                        Appearance="Secondary" Click="Settings_Click" />
-            <ui:Button Content="关于" Height="36" Margin="4,2"
+            <ui:Button Content="关于" Width="150" Height="36" Margin="4,2"
                        Appearance="Secondary" Click="About_Click" />
-        </UniformGrid>
+        </WrapPanel>
     </Grid>
 </ui:FluentWindow>
