@@ -7,7 +7,6 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
 using MoonDropEQ.Core;
 using MoonDropEQ.Services;
@@ -268,7 +267,7 @@ public partial class DeviceCaptureDialog : FluentWindow
         SetCheck(SavedCheck, snapshot.Saved, "保存命令");
     }
 
-    private void SetCheck(TextBlock target, bool done, string label)
+    private void SetCheck(System.Windows.Controls.TextBlock target, bool done, string label)
     {
         target.Text = (done ? "● " : "○ ") + label;
         target.Foreground = (Brush)FindResource(done ? "AppSuccessBrush" : "AppTextTertiaryBrush");
