@@ -19,7 +19,7 @@
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="CornerRadius" Value="8" />
             <Setter Property="Padding" Value="12,10" />
-            <Setter Property="Margin" Value="0,0,8,8" />
+            <Setter Property="Margin" Value="0,0,6,6" />
             <Setter Property="Cursor" Value="Hand" />
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
@@ -84,26 +84,26 @@
                             <ColumnDefinition x:Name="SideColumn" Width="280" />
                         </Grid.ColumnDefinitions>
 
-                        <Grid Grid.Column="0" Margin="0,0,16,0">
+                        <Grid Grid.Column="0" Margin="0,0,12,0">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
 
-                            <Grid Grid.Row="0" Margin="0,0,0,8">
+                            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
                                 <TextBlock Text="预设" FontSize="16"
                                            Foreground="{DynamicResource AppTextPrimaryBrush}" />
-                                <TextBlock Text="点击应用 · 右键更多" HorizontalAlignment="Right"
+                                <TextBlock Text="点击应用 · 右键更多" Margin="10,2,0,0"
                                            FontSize="12" VerticalAlignment="Center"
                                            Foreground="{DynamicResource AppTextTertiaryBrush}" />
-                            </Grid>
+                            </StackPanel>
 
                             <ScrollViewer Grid.Row="1" x:Name="PresetScrollViewer"
                                           VerticalScrollBarVisibility="Auto">
                                 <ItemsControl x:Name="PresetList">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
-                                            <WrapPanel ItemWidth="200" />
+                                            <WrapPanel ItemWidth="208" />
                                         </ItemsPanelTemplate>
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
@@ -197,21 +197,6 @@
                                            Margin="0,3,0,0" TextWrapping="Wrap" LineHeight="18"
                                            Foreground="{DynamicResource AppTextSecondaryBrush}" />
 
-                                <Border Height="1" Margin="0,14,0,12"
-                                        Background="{DynamicResource AppBorderBrush}" />
-
-                                <TextBlock Text="显示" FontSize="12"
-                                           Foreground="{DynamicResource AppTextTertiaryBrush}" />
-                                <Grid Margin="0,6,0,0">
-                                    <TextBlock Text="界面缩放" FontSize="12"
-                                               Foreground="{DynamicResource AppTextSecondaryBrush}" />
-                                    <TextBlock x:Name="SideScaleText" Text="100%" FontSize="12"
-                                               HorizontalAlignment="Right"
-                                               Foreground="{DynamicResource AppTextPrimaryBrush}" />
-                                </Grid>
-                                <Button Content="调整" Height="28" Padding="10,0" FontSize="12"
-                                        HorizontalAlignment="Left" Margin="0,8,0,0"
-                                        Click="SideScale_Click" />
                             </StackPanel>
                         </Border>
                     </Grid>

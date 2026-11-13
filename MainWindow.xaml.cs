@@ -584,11 +584,6 @@ public partial class MainWindow : FluentWindow, IUiScalable
         MinHeight = Math.Min(480 * scale + 16, maxHeight);
         Width = Math.Min(960 * scale + 16, maxWidth);
         Height = Math.Min(620 * scale + 16, maxHeight);
-
-        if (SideScaleText is not null)
-        {
-            SideScaleText.Text = $"{Math.Round(scale * 100)}%";
-        }
     }
 
     private void UpdateResponsiveLayout()
@@ -620,11 +615,6 @@ public partial class MainWindow : FluentWindow, IUiScalable
         {
             DeletePreset(_activePreset);
         }
-    }
-
-    private void SideScale_Click(object sender, RoutedEventArgs e)
-    {
-        ShowPage(SettingsHost);
     }
 
     private void UpdateConnection(bool? connected, string message)
