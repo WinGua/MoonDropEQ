@@ -4,11 +4,13 @@ on:
   push:
     branches: [ main ]
     tags: [ 'v*' ]
-    paths-ignore:
-      - '**.md'
-      - 'docs/**'
-      - 'LICENSE'
-      - '.github/ISSUE_TEMPLATE/**'
+    paths:
+      - '**.cs'
+      - '**.xaml'
+      - 'MoonDropEQ.csproj'
+      - 'app.manifest'
+      - 'Assets/**'
+      - 'Core/devices.json'
   workflow_dispatch:
 
 permissions:
