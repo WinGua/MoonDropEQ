@@ -5,7 +5,7 @@ namespace MoonDropEQ.Services;
 
 public static class UiScaleHelper
 {
-    public static void Apply(Window window, double baseWidth, double? baseHeight = null)
+    public static void Apply(Window window, double baseWidth)
     {
         var scale = ThemeService.UiScale;
         var workArea = SystemParameters.WorkArea;
@@ -20,10 +20,5 @@ public static class UiScaleHelper
         window.MaxWidth = maxWidth;
         window.MaxHeight = maxHeight;
         window.Width = Math.Min(baseWidth * scale, maxWidth);
-
-        if (baseHeight.HasValue)
-        {
-            window.Height = Math.Min(baseHeight.Value * scale, maxHeight);
-        }
     }
 }

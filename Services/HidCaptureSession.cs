@@ -238,16 +238,11 @@ public sealed class HidCaptureSession : IAsyncDisposable
     private string _tempProfile = string.Empty;
     private int _nextId = 100;
 
-    public string? BrowserPath { get; private set; }
-
     public int Port { get; private set; }
-
-    public bool IsRunning => _ws?.State == WebSocketState.Open;
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         var browserPath = FindBrowser() ?? throw new InvalidOperationException("未找到 Edge 或 Chrome");
-        BrowserPath = browserPath;
         Port = GetFreePort();
         _tempProfile = Path.Combine(
             Path.GetTempPath(),

@@ -101,23 +101,12 @@ public partial class SettingsView : UserControl
         UpdateSettings(settings => settings.Theme = ThemeMode.Light);
     }
 
-    private void Scale90_Checked(object sender, RoutedEventArgs e)
+    private void Scale_Checked(object sender, RoutedEventArgs e)
     {
-        UpdateSettings(settings => settings.UiScalePercent = 90);
-    }
-
-    private void Scale100_Checked(object sender, RoutedEventArgs e)
-    {
-        UpdateSettings(settings => settings.UiScalePercent = 100);
-    }
-
-    private void Scale110_Checked(object sender, RoutedEventArgs e)
-    {
-        UpdateSettings(settings => settings.UiScalePercent = 110);
-    }
-
-    private void Scale125_Checked(object sender, RoutedEventArgs e)
-    {
-        UpdateSettings(settings => settings.UiScalePercent = 125);
+        if (sender is RadioButton { Tag: string value }
+            && int.TryParse(value, out var percent))
+        {
+            UpdateSettings(settings => settings.UiScalePercent = percent);
+        }
     }
 }

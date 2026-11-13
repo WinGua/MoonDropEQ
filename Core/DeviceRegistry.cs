@@ -11,8 +11,6 @@ public static class DeviceRegistry
 
     private static readonly Lazy<List<DeviceProfile>> Profiles = new(LoadProfiles);
 
-    public static IReadOnlyList<DeviceProfile> All => Profiles.Value;
-
     public static DeviceProfile? DefaultProfile => Profiles.Value.FirstOrDefault();
 
     public static DeviceProfile? Match(int vendorId, int productId)

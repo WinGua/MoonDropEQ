@@ -18,9 +18,9 @@
             <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="CornerRadius" Value="8" />
-            <Setter Property="Padding" Value="12,10" />
+            <Setter Property="Padding" Value="12,8" />
             <Setter Property="Margin" Value="0,0,6,6" />
-            <Setter Property="MinHeight" Value="88" />
+            <Setter Property="MinHeight" Value="84" />
             <Setter Property="Cursor" Value="Hand" />
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
@@ -99,8 +99,7 @@
                                            Foreground="{DynamicResource AppTextTertiaryBrush}" />
                             </StackPanel>
 
-                            <ScrollViewer Grid.Row="1" x:Name="PresetScrollViewer"
-                                          VerticalScrollBarVisibility="Auto">
+                            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                                 <ItemsControl x:Name="PresetList">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
@@ -148,7 +147,7 @@
                                                                Foreground="{DynamicResource AppTextTertiaryBrush}" />
 
                                                     <Border Grid.Row="2" Padding="8,3" CornerRadius="4"
-                                                            Margin="0,8,0,0" HorizontalAlignment="Left"
+                                                            Margin="0,6,0,0" HorizontalAlignment="Left"
                                                             Background="{DynamicResource AppSurfaceBrush}"
                                                             BorderBrush="{DynamicResource AppBorderBrush}"
                                                             BorderThickness="1">
@@ -168,41 +167,48 @@
                                 Margin="0,0,12,0"
                                 Background="{DynamicResource AppSurfaceBrush}"
                                 BorderBrush="{DynamicResource AppBorderBrush}"
-                                BorderThickness="1"
-                                VerticalAlignment="Top">
-                            <StackPanel>
-                                <TextBlock Text="当前预设" FontSize="12"
-                                           Foreground="{DynamicResource AppTextTertiaryBrush}" />
-                                <TextBlock x:Name="SideCurrentName" Text="未选择" FontSize="20" Margin="0,4,0,0"
-                                           Foreground="{DynamicResource AppTextPrimaryBrush}" />
-                                <TextBlock x:Name="SideCurrentMeta" Text="点击右侧卡片应用" FontSize="12"
-                                           Margin="0,2,0,0" TextWrapping="Wrap"
-                                           Foreground="{DynamicResource AppTextSecondaryBrush}" />
+                                BorderThickness="1">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
 
-                                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-                                    <Button x:Name="SideRenameButton" Content="重命名" Height="28" Padding="10,0"
-                                            FontSize="12" IsEnabled="False" Click="SideRename_Click" />
-                                    <Button x:Name="SideHotkeyButton" Content="热键" Height="28" Padding="10,0"
-                                            FontSize="12" Margin="6,0,0,0" IsEnabled="False" Click="SideHotkey_Click" />
-                                    <Button x:Name="SideDeleteButton" Content="删除" Height="28" Padding="10,0"
-                                            FontSize="12" Margin="6,0,0,0" IsEnabled="False" Click="SideDelete_Click" />
+                                <StackPanel Grid.Row="0">
+                                    <TextBlock Text="当前预设" FontSize="12"
+                                               Foreground="{DynamicResource AppTextTertiaryBrush}" />
+                                    <TextBlock x:Name="SideCurrentName" Text="未选择" FontSize="20" Margin="0,4,0,0"
+                                               Foreground="{DynamicResource AppTextPrimaryBrush}" />
+                                    <TextBlock x:Name="SideCurrentMeta" Text="点击右侧卡片应用" FontSize="12"
+                                               Margin="0,2,0,0" TextWrapping="Wrap"
+                                               Foreground="{DynamicResource AppTextSecondaryBrush}" />
+
+                                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                        <Button x:Name="SideRenameButton" Content="重命名" Height="28" Padding="10,0"
+                                                FontSize="12" IsEnabled="False" Click="SideRename_Click" />
+                                        <Button x:Name="SideHotkeyButton" Content="热键" Height="28" Padding="10,0"
+                                                FontSize="12" Margin="6,0,0,0" IsEnabled="False" Click="SideHotkey_Click" />
+                                        <Button x:Name="SideDeleteButton" Content="删除" Height="28" Padding="10,0"
+                                                FontSize="12" Margin="6,0,0,0" IsEnabled="False" Click="SideDelete_Click" />
+                                    </StackPanel>
+
+                                    <Border Height="1" Margin="0,16,0,14"
+                                            Background="{DynamicResource AppBorderBrush}" />
+
+                                    <TextBlock Text="设备" FontSize="12"
+                                               Foreground="{DynamicResource AppTextTertiaryBrush}" />
+                                    <TextBlock x:Name="SideDeviceName" Text="未连接" FontSize="15" Margin="0,4,0,0"
+                                               Foreground="{DynamicResource AppTextPrimaryBrush}" />
+                                    <TextBlock x:Name="SideDeviceMeta" Text="插入耳机后自动识别" FontSize="12"
+                                               Margin="0,3,0,0" TextWrapping="Wrap" LineHeight="18"
+                                               Foreground="{DynamicResource AppTextSecondaryBrush}" />
                                 </StackPanel>
 
-                                <Border Height="1" Margin="0,16,0,14"
-                                        Background="{DynamicResource AppBorderBrush}" />
-
-                                <TextBlock Text="设备" FontSize="12"
+                                <TextBlock Grid.Row="2" Text="右键预设可以重命名、设置热键或删除。"
+                                           FontSize="12" TextWrapping="Wrap" LineHeight="18"
                                            Foreground="{DynamicResource AppTextTertiaryBrush}" />
-                                <TextBlock x:Name="SideDeviceName" Text="未连接" FontSize="15" Margin="0,4,0,0"
-                                           Foreground="{DynamicResource AppTextPrimaryBrush}" />
-                                <TextBlock x:Name="SideDeviceMeta" Text="插入耳机后自动识别" FontSize="12"
-                                           Margin="0,3,0,0" TextWrapping="Wrap" LineHeight="18"
-                                           Foreground="{DynamicResource AppTextSecondaryBrush}" />
-
-                                <TextBlock Text="右键预设可以重命名、设置热键或删除。"
-                                           Margin="0,16,0,0" FontSize="12" TextWrapping="Wrap" LineHeight="18"
-                                           Foreground="{DynamicResource AppTextTertiaryBrush}" />
-                            </StackPanel>
+                            </Grid>
                         </Border>
                     </Grid>
 
