@@ -28,6 +28,7 @@ public partial class DeviceCaptureDialog : FluentWindow
     {
         InitializeComponent();
         ThemeService.ApplyBackdrop(this);
+        UiScaleHelper.Apply(this, 560, 640);
     }
 
     private async void Start_Click(object sender, RoutedEventArgs e)

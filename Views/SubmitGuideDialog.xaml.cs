@@ -17,6 +17,7 @@ public partial class SubmitGuideDialog : FluentWindow
     {
         InitializeComponent();
         ThemeService.ApplyBackdrop(this);
+        UiScaleHelper.Apply(this, 480);
 
         var latest = CaptureStorage.LatestPackage();
         PackageText.Text = latest is null

@@ -16,6 +16,7 @@ public partial class HotkeyDialog : FluentWindow
         PresetText.Text = $"为「{presetName}」设置热键";
         GestureText.Text = string.IsNullOrWhiteSpace(current) ? "未绑定" : current;
         Services.ThemeService.ApplyBackdrop(this);
+        Services.UiScaleHelper.Apply(this, 380);
     }
 
     public static string? Show(Window owner, string presetName, string current)

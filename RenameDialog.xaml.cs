@@ -8,6 +8,7 @@ public partial class RenameDialog : FluentWindow
     private RenameDialog(string title, string hint, string initial)
     {
         InitializeComponent();
+        Services.UiScaleHelper.Apply(this, 360);
         Title = title;
         HintText.Text = hint;
         NameBox.Text = initial;

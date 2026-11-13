@@ -14,6 +14,7 @@ public partial class ConfirmDialog : FluentWindow
         MessageText.Text = message;
         OkButton.Content = confirmText;
         Services.ThemeService.ApplyBackdrop(this);
+        Services.UiScaleHelper.Apply(this, 400);
     }
 
     public static bool Show(Window owner, string title, string message, string confirmText = "确定")
