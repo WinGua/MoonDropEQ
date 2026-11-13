@@ -592,7 +592,7 @@ public partial class MainWindow : FluentWindow, IUiScalable
         var wide = ActualWidth >= 840;
         SidePanel.Visibility = wide ? Visibility.Visible : Visibility.Collapsed;
         SideColumn.Width = wide ? new GridLength(280) : new GridLength(0);
-        FooterGrid.Columns = wide ? 4 : 2;
+        FooterPanel.Columns = wide ? 4 : 2;
     }
 
     private void SideRename_Click(object sender, RoutedEventArgs e)

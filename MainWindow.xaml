@@ -263,7 +263,7 @@
             </Grid>
         </Grid>
 
-        <UniformGrid x:Name="FooterGrid" Grid.Row="2" Columns="4" Margin="12,8,12,12">
+        <UniformGrid x:Name="FooterPanel" Grid.Row="2" Columns="4" Margin="12,8,12,12">
             <ui:Button x:Name="CaptureButton" Content="抓取曲线" Height="36"
                        Appearance="Primary" Margin="4,2"
                        Click="CaptureButton_Click" />
