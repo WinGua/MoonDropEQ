@@ -28,40 +28,24 @@
 
 ### 适配新设备
 
-1. 底栏「设备适配」→「设备采集」
-2. 按提示在官网应用一次「默认」和一条「自定义曲线」
-3. 点「采集提交」，选择提交 Issue 或按 PR 指南提交
-
-采集只读取耳机信息，不会写入。完整步骤和验证要求见 [docs/adding-device.md](docs/adding-device.md)。
+底栏「设备适配」→「设备采集」，按提示在官网各应用一次「默认」和一条「自定义曲线」，再点「采集提交」选择 Issue 或 PR。采集只读取耳机信息，不会写入；完整步骤和验证要求见 [docs/adding-device.md](docs/adding-device.md)。
 
 ## 使用
 
-1. 插好耳机，双击 `MoonDropEQ.exe`（免安装，单文件）
-2. 点击预设卡片，或按对应热键
+1. 插好耳机，双击 `MoonDropEQ.exe`（免安装，单文件）。
+2. 点击预设卡片，或按对应热键。
 
-首次运行若被 SmartScreen 拦截，选「更多信息 → 仍要运行」。设置、热键、曲线抓取等操作都在应用内。
-
-## 数据
-
-预设保存在 `%APPDATA%\MoonDropEQ\presets.json`，纯文本，可备份或迁移。
-
-## 构建与维护
-
-只使用 GitHub Actions 云端构建，本地无需安装 .NET SDK：
-
-- push `main` → 构建；push `v*` 标签 → 发布 Release
-- 构建前自动执行 `tools/validate-devices.ps1` 校验 `Core/devices.json`
-- 产物只有 `MoonDropEQ.exe`：Actions artifact 会被自动打包成 zip，Release 提供压缩包
-- 工作流：`.github/workflows/build.yml`
-
-协议抓包、固件升级适配与发版流程见 [docs/maintenance.md](docs/maintenance.md)。
+首次运行若被 SmartScreen 拦截，选「更多信息 → 仍要运行」。设置、热键、曲线抓取都在应用内；预设保存在 `%APPDATA%\MoonDropEQ\presets.json`，纯文本，可备份或迁移。
 
 ## 安全说明
 
-- 只写 EQ 参数区与保存命令，**不触碰固件分区、不涉及 OTA 升级**
-- 写入内容与官网页面发出的字节完全一致
-- 每次应用会写一次 flash，正常使用频率下远低于寿命
-- 建议保留官网作为曲线编辑器，本工具负责日常快速切换
+- 只写 EQ 参数区与保存命令，**不触碰固件分区、不涉及 OTA 升级**；写入内容与官网页面发出的字节完全一致。
+- 每次应用会写一次 flash，正常使用频率下远低于寿命。
+- 建议保留官网作为曲线编辑器，本工具负责日常快速切换。
+
+## 构建
+
+仅使用 GitHub Actions 云端构建，本地无需安装 .NET SDK：push `main` 构建，push `v*` 标签发布 Release；构建前自动校验 `Core/devices.json`。产物只有 `MoonDropEQ.exe`，Actions artifact 下载时会额外包一层 zip，Release 提供压缩包。工作流见 `.github/workflows/build.yml`，协议抓包、固件升级适配与发版细节见 [docs/maintenance.md](docs/maintenance.md)。
 
 ## 免责声明
 
