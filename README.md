@@ -1,8 +1,22 @@
-# MoonDropEQ
+<p align="center">
+  <img src="Assets/app.png" width="110" alt="MoonDropEQ" />
+</p>
 
-水月雨 MOONDROP 耳机的 Windows 桌面 EQ 遥控器：把官网的「选设备 → 挑预设 → 应用」压缩成**一次点击**或**一个热键**。
+<h1 align="center">MoonDropEQ</h1>
 
-[下载最新版](https://github.com/WinGua/MoonDropEQ/releases/latest) · [适配新设备](docs/adding-device.md) · [问题反馈](https://github.com/WinGua/MoonDropEQ/issues)
+<p align="center">水月雨 MOONDROP 耳机的 Windows 桌面 EQ 遥控器：把官网的「选设备 → 挑预设 → 应用」压缩成<strong>一次点击</strong>或<strong>一个热键</strong>。</p>
+
+<p align="center">
+  <a href="https://github.com/WinGua/MoonDropEQ/releases/latest"><img src="https://img.shields.io/github/v/release/WinGua/MoonDropEQ?label=release" alt="Release" /></a>
+  <img src="https://img.shields.io/badge/license-GPL--3.0-blue" alt="License: GPL-3.0" />
+  <img src="https://img.shields.io/badge/platform-Windows-0078D6" alt="Platform: Windows" />
+</p>
+
+<p align="center">
+  <a href="https://github.com/WinGua/MoonDropEQ/releases/latest">下载最新版</a> ·
+  <a href="docs/adding-device.md">适配新设备</a> ·
+  <a href="https://github.com/WinGua/MoonDropEQ/issues">问题反馈</a>
+</p>
 
 ## 支持设备
 
