@@ -140,12 +140,6 @@ Rays 内置槽位：`0` 默认、`1` 音乐游戏、`2` 3A 游戏、`3` FPS1、`
 - 每次应用会写一次 flash，正常使用频率下远低于寿命
 - 建议保留官网作为曲线编辑器，本工具负责日常快速切换
 
-## 许可证
-
-[GNU General Public License v3.0](LICENSE)。对外分发修改版时，必须继续以 GPL-3.0 开源并提供源代码；仅自行修改、不对外分发不受限制。
-
-Copyright (C) 2026 WinGua。第三方组件许可见 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。
-
 ## 免责声明
 
 非官方工具，与水月雨（MOONDROP）无隶属关系。协议基于官网公开前端实现分析得出，固件或官网更新后可能需要适配。使用风险自负。
