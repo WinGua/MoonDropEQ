@@ -6,8 +6,8 @@
                  xmlns:views="clr-namespace:MoonDropEQ.Views"
                  Title="MoonDropEQ"
                  Icon="/Assets/app.png"
-                 Width="976" Height="556"
-                 MinWidth="656" MinHeight="456"
+                 Width="976" Height="536"
+                 MinWidth="656" MinHeight="436"
                  WindowStartupLocation="CenterScreen"
                  WindowBackdropType="Mica"
                  ExtendsContentIntoTitleBar="True">
@@ -20,6 +20,7 @@
             <Setter Property="CornerRadius" Value="8" />
             <Setter Property="Padding" Value="12,10" />
             <Setter Property="Margin" Value="0,0,6,6" />
+            <Setter Property="MinHeight" Value="88" />
             <Setter Property="Cursor" Value="Hand" />
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
@@ -103,7 +104,7 @@
                                 <ItemsControl x:Name="PresetList">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
-                                            <WrapPanel ItemWidth="212" />
+                                            <UniformGrid Columns="2" />
                                         </ItemsPanelTemplate>
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
@@ -269,17 +270,17 @@
             </Grid>
         </Grid>
 
-        <UniformGrid x:Name="FooterPanel" Grid.Row="2" Columns="4"
-                     HorizontalAlignment="Center" Margin="12,8,12,12">
-            <ui:Button x:Name="CaptureButton" Content="抓取曲线" Height="36"
+        <StackPanel x:Name="FooterPanel" Grid.Row="2" Orientation="Horizontal"
+                    HorizontalAlignment="Center" Margin="12,8,12,12">
+            <ui:Button x:Name="CaptureButton" Content="抓取曲线" Width="150" Height="36"
                        Appearance="Primary" Margin="4,2"
                        Click="CaptureButton_Click" />
-            <ui:Button Content="设备适配" Height="36" Margin="4,2"
+            <ui:Button Content="设备适配" Width="150" Height="36" Margin="4,2"
                        Appearance="Secondary" Click="Device_Click" />
-            <ui:Button Content="设置" Height="36" Margin="4,2"
+            <ui:Button Content="设置" Width="150" Height="36" Margin="4,2"
                        Appearance="Secondary" Click="Settings_Click" />
-            <ui:Button Content="关于" Height="36" Margin="4,2"
+            <ui:Button Content="关于" Width="150" Height="36" Margin="4,2"
                        Appearance="Secondary" Click="About_Click" />
-        </UniformGrid>
+        </StackPanel>
     </Grid>
 </ui:FluentWindow>
