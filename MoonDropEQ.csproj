@@ -25,6 +25,8 @@
     <Resource Include="Assets\app.png" />
     <None Remove="Core\devices.json" />
     <EmbeddedResource Include="Core\devices.json" LogicalName="MoonDropEQ.Core.devices.json" />
+    <None Update="LICENSE" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="THIRD-PARTY-NOTICES.md" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

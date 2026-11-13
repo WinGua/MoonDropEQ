@@ -136,6 +136,8 @@
 - push 到 `main` → 自动构建并上传产物 `MoonDropEQ-win-x64`
 - 推送 `v*` 标签 → 自动创建 Release 并附带 zip
 - 构建前会执行 `tools/validate-devices.ps1` 校验 `Core/devices.json`
+- Actions 里的 `MoonDropEQ-win-x64` 是 GitHub 自动打包的外层 zip，里面直接是 exe 和许可证文件，不再套一层应用 zip
+- Release 资产 `MoonDropEQ-win-x64.zip` 是单独的应用压缩包
 - 工作流：`.github/workflows/build.yml`（`windows-latest` + `dotnet publish -r win-x64 --self-contained`）
 
 ## 维护
@@ -148,6 +150,10 @@
 - 写入内容与官网页面发出的字节完全一致
 - 每次应用会写一次 flash，正常使用频率下远低于寿命
 - 建议保留官网作为曲线编辑器，本工具负责日常快速切换
+
+## 许可证
+
+本项目使用 [MIT License](LICENSE)。第三方组件许可见 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。
 
 ## 免责声明
 
