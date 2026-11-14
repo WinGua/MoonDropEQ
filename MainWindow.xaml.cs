@@ -27,6 +27,11 @@ public partial class MainWindow : FluentWindow, IUiScalable
     private Preset? _activePreset;
     private bool _busy;
     private bool _exiting;
+    private Point _dragStartPoint;
+    private PresetItem? _dragItem;
+    private FrameworkElement? _dragCard;
+    private bool _dragging;
+    private bool _suppressClick;
 
     public MainWindow()
     {
@@ -357,6 +362,11 @@ public partial class MainWindow : FluentWindow, IUiScalable
 
     private void PresetCard_Click(object sender, MouseButtonEventArgs e)
     {
+        if (_suppressClick)
+        {
+            return;
+        }
+
         if (FindButton(e.OriginalSource as DependencyObject) is not null)
         {
             return;
@@ -366,6 +376,138 @@ public partial class MainWindow : FluentWindow, IUiScalable
         {
             _ = ApplyPresetAsync(item.Model);
         }
+    }
+
+    private void PresetList_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        _dragStartPoint = e.GetPosition(PresetList);
+        _dragCard = FindCard(e.OriginalSource as DependencyObject);
+        _dragItem = _dragCard?.Tag as PresetItem;
+    }
+
+    private void PresetList_PreviewMouseMove(object sender, MouseEventArgs e)
+    {
+        if (e.LeftButton != MouseButtonState.Pressed || _dragging || _dragItem is null)
+        {
+            return;
+        }
+
+        var current = e.GetPosition(PresetList);
+        if (Math.Abs(current.X - _dragStartPoint.X) < SystemParameters.MinimumHorizontalDragDistance
+            && Math.Abs(current.Y - _dragStartPoint.Y) < SystemParameters.MinimumVerticalDragDistance)
+        {
+            return;
+        }
+
+        var card = _dragCard;
+        var item = _dragItem;
+        _dragging = true;
+        try
+        {
+            if (card is not null)
+            {
+                card.Opacity = 0.45;
+            }
+
+            DragDrop.DoDragDrop((DependencyObject?)card ?? PresetList, item, DragDropEffects.Move);
+        }
+        finally
+        {
+            if (card is not null)
+            {
+                card.Opacity = 1;
+            }
+
+            _dragging = false;
+            _dragItem = null;
+            _dragCard = null;
+            _suppressClick = true;
+            Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, new Action(() => _suppressClick = false));
+        }
+    }
+
+    private void PresetList_DragOver(object sender, DragEventArgs e)
+    {
+        var target = CardAt(e);
+        e.Effects = target is not null && e.Data.GetDataPresent(typeof(PresetItem))
+            ? DragDropEffects.Move
+            : DragDropEffects.None;
+        e.Handled = true;
+    }
+
+    private void PresetList_Drop(object sender, DragEventArgs e)
+    {
+        if (e.Data.GetData(typeof(PresetItem)) is not PresetItem dragged)
+        {
+            return;
+        }
+
+        if (CardAt(e)?.Tag is not PresetItem target || ReferenceEquals(target, dragged))
+        {
+            return;
+        }
+
+        var from = _items.IndexOf(dragged);
+        var to = _items.IndexOf(target);
+        if (from < 0 || to < 0)
+        {
+            return;
+        }
+
+        _items.Move(from, to);
+        PersistPresetOrder();
+        _tray?.Update(ActivePresets);
+        e.Handled = true;
+    }
+
+    private FrameworkElement? CardAt(DragEventArgs e)
+    {
+        var hit = PresetList.InputHitTest(e.GetPosition(PresetList));
+        return FindCard(hit as DependencyObject);
+    }
+
+    private static FrameworkElement? FindCard(DependencyObject? node)
+    {
+        while (node is not null)
+        {
+            if (node is FrameworkElement { Tag: PresetItem } card)
+            {
+                return card;
+            }
+
+            if (node is not System.Windows.Media.Visual
+                && node is not System.Windows.Media.Media3D.Visual3D)
+            {
+                return null;
+            }
+
+            node = System.Windows.Media.VisualTreeHelper.GetParent(node);
+        }
+
+        return null;
+    }
+
+    private void PersistPresetOrder()
+    {
+        var ordered = _items.Select(item => item.Model).ToList();
+        var next = 0;
+
+        for (var i = 0; i < _store.Presets.Count && next < ordered.Count; i++)
+        {
+            if (!string.Equals(_store.Presets[i].DeviceId, _activeDeviceId, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            if (!ReferenceEquals(_store.Presets[i], ordered[next]))
+            {
+                _store.Presets[i] = ordered[next];
+            }
+
+            next++;
+        }
+
+        _store.Save();
     }
 
     private static System.Windows.Controls.Primitives.ButtonBase? FindButton(DependencyObject? node)
